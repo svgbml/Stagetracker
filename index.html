@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage- & vacaturetracker</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --text:#1d2330; --muted:#667085; --line:#e3e6ec;
+  --accent:#2f5fd0; --accent-soft:#e8eefc; --warn:#b54708; --warn-soft:#fef0e6;
+  --bad:#b42318; --bad-soft:#fdecea; --good:#067647; --good-soft:#e6f6ee;
+  --radius:10px; --font: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#14171d;--panel:#1c2028;--text:#e6e8ec;--muted:#98a1b2;--line:#2c323d;
+  --accent:#7aa2ff;--accent-soft:#22304f;--warn:#f5a25d;--warn-soft:#3a2a1c;
+  --bad:#f97066;--bad-soft:#3b1f1d;--good:#47cd89;--good-soft:#173528;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--font)}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header h1{font-size:17px;margin:0;font-weight:650}
+nav{display:flex;gap:4px}
+nav button{background:none;border:0;padding:7px 12px;border-radius:8px;color:var(--muted);font:inherit;cursor:pointer}
+nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.spacer{flex:1}
+main{padding:18px 22px;max-width:1400px;margin:0 auto}
+button.btn{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer}
+button.btn:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.small{padding:3px 8px;font-size:12px}
+button.danger{color:var(--bad)}
+input,select,textarea{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:100%}
+textarea{min-height:70px;resize:vertical}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.toolbar input,.toolbar select{width:auto}
+.toolbar input[type=search]{min-width:220px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
+.stat b{display:block;font-size:22px}
+.stat span{color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--accent-soft);cursor:pointer}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;white-space:nowrap;background:var(--accent-soft);color:var(--accent)}
+.s-geinteresseerd{background:var(--accent-soft);color:var(--accent)}
+.s-gesolliciteerd{background:#efe8fd;color:#6941c6}
+.s-gesprek{background:var(--warn-soft);color:var(--warn)}
+.s-aangenomen{background:var(--good-soft);color:var(--good)}
+.s-afgewezen{background:var(--bad-soft);color:var(--bad)}
+@media (prefers-color-scheme: dark){.s-gesolliciteerd{background:#2d2445;color:#b9a3f5}}
+.due-late{color:var(--bad);font-weight:600}
+.due-soon{color:var(--warn);font-weight:600}
+.far{color:var(--bad)}
+.board{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:12px;overflow-x:auto}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px;min-height:200px}
+.col h3{font-size:13px;margin:0 0 8px;display:flex;justify-content:space-between}
+.col.drop{outline:2px dashed var(--accent)}
+.card{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--bg);cursor:grab}
+.card .t{font-weight:600}
+.card .m{font-size:12px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.item .grow{flex:1;min-width:200px}
+.empty{padding:30px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius)}
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--panel);color:var(--text);width:min(760px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dlg-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.dlg-head h2{margin:0;font-size:16px}
+.dlg-body{padding:16px 18px;max-height:70vh;overflow:auto}
+.dlg-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.grid .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.hist{font-size:12px;color:var(--muted);margin:6px 0 0;padding-left:18px}
+section h2{font-size:15px;margin:22px 0 10px}
+.badge{background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;margin-left:4px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (max-width:700px){.grid{grid-template-columns:1fr}.board{grid-template-columns:repeat(5,220px)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Stage- & vacaturetracker</h1>
+  <nav id="tabs">
+    <button data-view="overzicht" class="active">Overzicht</button>
+    <button data-view="bord">Status</button>
+    <button data-view="agenda">Herinneringen</button>
+    <button data-view="inbox">Nieuwe vondsten<span id="inboxBadge"></span></button>
+    <button data-view="bronnen">Bronnen</button>
+    <button data-view="instellingen">Instellingen</button>
+  </nav>
+  <div class="spacer"></div>
+  <button class="btn primary" id="addBtn">+ Toevoegen</button>
+</header>
+
+<main id="main"></main>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <div class="dlg-head"><h2 id="dlgTitle">Plek</h2><button class="btn small" value="cancel">Sluiten</button></div>
+    <div class="dlg-body">
+      <div class="grid">
+        <label>Organisatie<input name="organisatie" required></label>
+        <label>Functie / stage<input name="functie" required></label>
+        <label>Soort<select name="soort"></select></label>
+        <label>Sector<select name="sector"></select></label>
+        <label>Locatie<input name="locatie" placeholder="plaats"></label>
+        <label>Reistijd enkele reis (min)<input name="reistijd" type="number" min="0" step="5"></label>
+        <label>Deadline<input name="deadline" type="date"></label>
+        <label>Startdatum<input name="start" type="date"></label>
+        <label class="full">Link<input name="link" type="url" placeholder="https://"></label>
+        <label>Contactpersoon<input name="contact"></label>
+        <label>Contact e-mail / telefoon<input name="contactInfo"></label>
+        <label>Status<select name="status"></select></label>
+        <label>Follow-up op<input name="followUp" type="date"></label>
+        <label>Cv-versie<select name="cv"></select></label>
+        <label>Motivatiebrief-versie<select name="motivatie"></select></label>
+        <label class="full">Notities<textarea name="notities"></textarea></label>
+      </div>
+      <div id="histBox"></div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn danger" type="button" id="delBtn">Verwijderen</button>
+      <button class="btn" type="button" id="icsBtn">Naar agenda (.ics)</button>
+      <div class="spacer"></div>
+      <button class="btn primary" value="save" id="saveBtn">Opslaan</button>
+    </div>
+  </form>
+</dialog>
+
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- constants ---------- */
+const STATUSES = [
+  {id:"geinteresseerd", label:"Geïnteresseerd"},
+  {id:"gesolliciteerd", label:"Gesolliciteerd"},
+  {id:"gesprek",        label:"Gesprek"},
+  {id:"aangenomen",     label:"Aangenomen"},
+  {id:"afgewezen",      label:"Afgewezen"}
+];
+const SOORTEN = ["Stage jaar 3","Afstudeerstage","Bijbaan","Vacature (na afstuderen)","Open sollicitatie"];
+const SECTOREN = ["Forensisch","Ziekenhuislab","Onderzoeksinstituut","Universiteit","Industrie / farma","Overheid","Overig"];
+const STORE = "stagetracker.v1";
+const INBOX_URL = "data/gevonden.json";
+const DEFAULT_BRONNEN = [
+  {naam:"NFI – werken & stage", url:"https://www.google.com/search?q=NFI+Nederlands+Forensisch+Instituut+stage+hbo"},
+  {naam:"Forensische labs (NL)", url:"https://www.google.com/search?q=forensisch+laboratorium+stage+hbo+Nederland"},
+  {naam:"Ziekenhuislabs Brabant", url:"https://www.google.com/search?q=ziekenhuis+laboratorium+stage+hbo+Brabant"},
+  {naam:"Avans stagebank", url:"", notitie:"Via Brightspace / opleiding – link zelf invullen"},
+  {naam:"Magnet.me – lab stages", url:"https://magnet.me/nl-NL/"},
+  {naam:"Indeed – laboratorium stage", url:"https://nl.indeed.com/q-laboratorium-stage-vacatures.html"}
+];
+const MAX_REISTIJD_DEFAULT = 90;
+
+/* ---------- state ---------- */
+let db = load();
+let view = "overzicht";
+let editingId = null;
+let sort = {key:"deadline", dir:1};
+let filters = {q:"", soort:"", status:"", actief:true};
+let inbox = [];
+
+function blank(){
+  return {items:[], settings:{maxReistijd:MAX_REISTIJD_DEFAULT, cvVersies:["cv-v1"], motivatieVersies:["motivatie-algemeen-v1"], bronnen:DEFAULT_BRONNEN}, genegeerd:[]};
+}
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(STORE)); if(d && d.items) return Object.assign(blank(), d); }catch(e){}
+  return blank();
+}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(db)); }catch(e){ toast("Opslaan in browser mislukt – exporteer je data"); } }
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today = () => new Date().toISOString().slice(0,10);
+function daysUntil(d){ if(!d) return null; return Math.round((new Date(d+"T00:00") - new Date(today()+"T00:00"))/86400000); }
+function fmtDate(d){ if(!d) return ""; return new Date(d+"T00:00").toLocaleDateString("nl-NL",{day:"numeric",month:"short",year:"numeric"}); }
+function statusLabel(id){ return (STATUSES.find(s=>s.id===id)||{}).label || id; }
+function pill(id){ return `<span class="pill s-${id}">${statusLabel(id)}</span>`; }
+function dueHtml(d, done){
+  if(!d) return '<span class="muted">–</span>';
+  const n = daysUntil(d);
+  let cls = "", extra = "";
+  if(!done){ if(n<0){cls="due-late";extra=` (${-n}d geleden)`} else if(n<=7){cls="due-soon";extra=n===0?" (vandaag)":` (nog ${n}d)`} }
+  return `<span class="${cls}">${fmtDate(d)}${extra}</span>`;
+}
+const isClosed = it => it.status==="aangenomen" || it.status==="afgewezen";
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+function reistijdHtml(m){
+  if(m===""||m==null) return '<span class="muted">–</span>';
+  const far = Number(m) > Number(db.settings.maxReistijd);
+  return `<span class="${far?"far":""}" title="${far?"Boven je max reistijd":""}">${m} min</span>`;
+}
+
+/* ---------- views ---------- */
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
+  const n = inbox.filter(x=>!known(x)).length;
+  $("#inboxBadge").innerHTML = n ? `<span class="badge">${n}</span>` : "";
+  ({overzicht, bord, agenda, inbox:inboxView, bronnen, instellingen})[view]();
+}
+
+function filtered(){
+  const q = filters.q.toLowerCase();
+  return db.items.filter(it=>{
+    if(filters.actief && isClosed(it)) return false;
+    if(filters.soort && it.soort!==filters.soort) return false;
+    if(filters.status && it.status!==filters.status) return false;
+    if(q && !`${it.organisatie} ${it.functie} ${it.locatie} ${it.notities}`.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    let x=a[sort.key]??"", y=b[sort.key]??"";
+    if(sort.key==="reistijd"){x=Number(x)||9999;y=Number(y)||9999;}
+    if(sort.key==="deadline"){x=x||"9999";y=y||"9999";}
+    if(sort.key==="status"){x=STATUSES.findIndex(s=>s.id===a.status);y=STATUSES.findIndex(s=>s.id===b.status);}
+    return (x>y?1:x<y?-1:0)*sort.dir;
+  });
+}
+
+function overzicht(){
+  const all = db.items;
+  const cnt = id => all.filter(i=>i.status===id).length;
+  const soon = all.filter(i=>!isClosed(i) && i.deadline && daysUntil(i.deadline)>=0 && daysUntil(i.deadline)<=14).length;
+  const rows = filtered();
+  const cols = [["organisatie","Organisatie"],["functie","Functie / stage"],["soort","Soort"],["locatie","Locatie"],["reistijd","Reistijd"],["deadline","Deadline"],["status","Status"],["contact","Contact"],["link","Link"]];
+  $("#main").innerHTML = `
+  <div class="stats">
+    <div class="stat"><b>${all.length}</b><span>Totaal</span></div>
+    ${STATUSES.map(s=>`<div class="stat"><b>${cnt(s.id)}</b><span>${s.label}</span></div>`).join("")}
+    <div class="stat"><b>${soon}</b><span>Deadline ≤ 14 dagen</span></div>
+  </div>
+  <div class="toolbar">
+    <input type="search" id="fq" placeholder="Zoek organisatie, functie, plaats…" value="${esc(filters.q)}">
+    <select id="fs"><option value="">Alle soorten</option>${SOORTEN.map(s=>`<option ${filters.soort===s?"selected":""}>${s}</option>`).join("")}</select>
+    <select id="fst"><option value="">Alle statussen</option>${STATUSES.map(s=>`<option value="${s.id}" ${filters.status===s.id?"selected":""}>${s.label}</option>`).join("")}</select>
+    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--text)"><input type="checkbox" id="fa" style="width:auto" ${filters.actief?"checked":""}> alleen lopend</label>
+  </div>
+  ${rows.length ? `<table><thead><tr>${cols.map(([k,l])=>`<th data-k="${k}">${l}${sort.key===k?(sort.dir>0?" ▲":" ▼"):""}</th>`).join("")}</tr></thead><tbody>
+  ${rows.map(it=>`<tr data-id="${it.id}">
+    <td><b>${esc(it.organisatie)}</b><div class="muted" style="font-size:12px">${esc(it.sector||"")}</div></td>
+    <td>${esc(it.functie)}</td><td>${esc(it.soort)}</td><td>${esc(it.locatie)}</td>
+    <td>${reistijdHtml(it.reistijd)}</td><td>${dueHtml(it.deadline, it.status!=="geinteresseerd")}</td>
+    <td>${pill(it.status)}</td><td>${esc(it.contact)}</td>
+    <td>${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">open ↗</a>`:""}</td></tr>`).join("")}
+  </tbody></table>` : `<div class="empty">${db.items.length?"Geen resultaten met deze filters.":"Nog niets toegevoegd. Klik op <b>+ Toevoegen</b> of kijk bij <b>Nieuwe vondsten</b>."}</div>`}`;
+  $("#fq").oninput = e=>{filters.q=e.target.value; const pos=e.target.selectionStart; overzicht(); const f=$("#fq"); f.focus(); f.setSelectionRange(pos,pos);};
+  $("#fs").onchange = e=>{filters.soort=e.target.value; overzicht();};
+  $("#fst").onchange = e=>{filters.status=e.target.value; overzicht();};
+  $("#fa").onchange = e=>{filters.actief=e.target.checked; overzicht();};
+  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k; sort = {key:k, dir: sort.key===k ? -sort.dir : 1}; overzicht();});
+  document.querySelectorAll("tbody tr").forEach(tr=>tr.onclick=()=>openForm(tr.dataset.id));
+}
+
+function bord(){
+  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Sleep een kaart naar een andere kolom om de status te wijzigen.</p><div class="board">${STATUSES.map(s=>{
+    const its = db.items.filter(i=>i.status===s.id).sort((a,b)=>(a.deadline||"9999")>(b.deadline||"9999")?1:-1);
+    return `<div class="col" data-s="${s.id}"><h3>${s.label}<span class="muted">${its.length}</span></h3>
+      ${its.map(it=>`<div class="card" draggable="true" data-id="${it.id}"><div class="t">${esc(it.organisatie)}</div><div class="m">${esc(it.functie)}</div><div class="m">${esc(it.soort)}${it.deadline?" · "+dueHtml(it.deadline, s.id!=="geinteresseerd"):""}</div></div>`).join("")}
+    </div>`;}).join("")}</div>`;
+  document.querySelectorAll(".card").forEach(c=>{
+    c.ondragstart = e=>e.dataTransfer.setData("text/plain", c.dataset.id);
+    c.onclick = ()=>openForm(c.dataset.id);
+  });
+  document.querySelectorAll(".col").forEach(col=>{
+    col.ondragover = e=>{e.preventDefault(); col.classList.add("drop");};
+    col.ondragleave = ()=>col.classList.remove("drop");
+    col.ondrop = e=>{e.preventDefault(); col.classList.remove("drop"); setStatus(e.dataTransfer.getData("text/plain"), col.dataset.s); bord();};
+  });
+}
+
+function setStatus(id, status){
+  const it = db.items.find(i=>i.id===id); if(!it || it.status===status) return;
+  it.status = status; it.historie = it.historie||[]; it.historie.push({datum:today(), status});
+  if(status==="gesolliciteerd" && !it.followUp){ const d=new Date(); d.setDate(d.getDate()+10); it.followUp=d.toISOString().slice(0,10); toast("Follow-up gezet op over 10 dagen"); }
+  save();
+}
+
+function events(){
+  const ev=[];
+  db.items.forEach(it=>{
+    if(isClosed(it)) return;
+    if(it.deadline && it.status==="geinteresseerd") ev.push({it, type:"Deadline sollicitatie", datum:it.deadline});
+    if(it.followUp) ev.push({it, type:"Follow-up", datum:it.followUp});
+  });
+  return ev.sort((a,b)=>a.datum>b.datum?1:-1);
+}
+function agenda(){
+  const ev = events();
+  $("#main").innerHTML = `<div class="toolbar"><button class="btn primary" id="icsAll">Alles naar agenda (.ics)</button><span class="muted">Importeer het .ics-bestand in Google Agenda (Instellingen → Importeren). Elk item krijgt een melding 3 dagen en 1 dag vooraf.</span></div>
+  ${ev.length?`<div class="list">${ev.map(e=>`<div class="item"><div style="width:150px">${dueHtml(e.datum)}</div><div class="grow"><b>${e.type}</b> – ${esc(e.it.organisatie)} · ${esc(e.it.functie)}</div>${pill(e.it.status)}<button class="btn small" data-id="${e.it.id}">Open</button></div>`).join("")}</div>`:`<div class="empty">Geen openstaande deadlines of follow-ups.</div>`}`;
+  $("#icsAll").onclick = ()=>downloadIcs(ev, "stagetracker-herinneringen.ics");
+  document.querySelectorAll(".item button[data-id]").forEach(b=>b.onclick=()=>openForm(b.dataset.id));
+}
+
+/* ---------- inbox (weekly scan results) ---------- */
+const keyOf = x => `${(x.organisatie||"").toLowerCase().trim()}|${(x.functie||"").toLowerCase().trim()}|${(x.link||"").trim()}`;
+function known(x){ const k=keyOf(x); return db.genegeerd.includes(k) || db.items.some(i=>keyOf(i)===k || (x.link && i.link===x.link)); }
+async function loadInbox(){
+  try{ const r = await fetch(INBOX_URL+"?t="+Date.now(), {cache:"no-store"}); if(r.ok){ const d = await r.json(); inbox = Array.isArray(d) ? d : (d.vondsten||[]); } }catch(e){ inbox = []; }
+  render();
+}
+function inboxView(){
+  const nieuw = inbox.filter(x=>!known(x));
+  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Vondsten uit de wekelijkse scan (<code>${INBOX_URL}</code> in je repo). Toevoegen zet ze op <i>Geïnteresseerd</i>; negeren onthoudt de app.</p>
+  <div class="toolbar"><button class="btn" id="reloadInbox">Opnieuw laden</button><button class="btn" id="loadLocalInbox">Scanbestand handmatig laden…</button></div>
+  ${nieuw.length?`<div class="list">${nieuw.map((x,i)=>`<div class="item"><div class="grow"><b>${esc(x.organisatie)}</b> – ${esc(x.functie)}<div class="muted" style="font-size:12px">${esc(x.soort||"")} · ${esc(x.locatie||"")}${x.reistijd?" · ~"+x.reistijd+" min":""}${x.deadline?" · deadline "+fmtDate(x.deadline):""}${x.gevondenOp?" · gevonden "+fmtDate(x.gevondenOp):""}</div>${x.notities?`<div style="font-size:12px">${esc(x.notities)}</div>`:""}</div>
+  ${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">bron ↗</a>`:""}<button class="btn small primary" data-add="${i}">Toevoegen</button><button class="btn small" data-ign="${i}">Negeren</button></div>`).join("")}</div>`
+  :`<div class="empty">Geen nieuwe vondsten.${inbox.length?"":" (Nog geen scanbestand gevonden – dat verschijnt na de eerste wekelijkse scan, of open de app via GitHub Pages.)"}</div>`}`;
+  $("#reloadInbox").onclick = loadInbox;
+  $("#loadLocalInbox").onclick = ()=>pickFile(d=>{ inbox = Array.isArray(d)?d:(d.vondsten||[]); render(); });
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{
+    const x = nieuw[+b.dataset.add];
+    db.items.push(normalize({...x, status:"geinteresseerd"})); save(); toast("Toegevoegd"); render();
+  });
+  document.querySelectorAll("[data-ign]").forEach(b=>b.onclick=()=>{ db.genegeerd.push(keyOf(nieuw[+b.dataset.ign])); save(); render(); });
+}
+
+function bronnen(){
+  const b = db.settings.bronnen;
+  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Plekken die de wekelijkse scan afloopt, en snelle links om zelf te zoeken. Max reistijd: <b>${db.settings.maxReistijd} min</b> enkele reis.</p>
+  <div class="list">${b.map((x,i)=>`<div class="item"><div class="grow"><b>${esc(x.naam)}</b>${x.notitie?`<div class="muted" style="font-size:12px">${esc(x.notitie)}</div>`:""}</div>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">open ↗</a>`:""}<button class="btn small" data-e="${i}">Wijzig</button><button class="btn small danger" data-d="${i}">×</button></div>`).join("")}</div>
+  <div class="toolbar" style="margin-top:12px"><button class="btn" id="addBron">+ Bron</button></div>`;
+  $("#addBron").onclick = ()=>{ const naam=prompt("Naam bron"); if(!naam) return; const url=prompt("URL (mag leeg)")||""; b.push({naam,url}); save(); bronnen(); };
+  document.querySelectorAll("[data-e]").forEach(x=>x.onclick=()=>{ const o=b[+x.dataset.e]; const naam=prompt("Naam",o.naam); if(naam===null) return; const url=prompt("URL",o.url||""); o.naam=naam; if(url!==null) o.url=url; save(); bronnen(); });
+  document.querySelectorAll("[data-d]").forEach(x=>x.onclick=()=>{ b.splice(+x.dataset.d,1); save(); bronnen(); });
+}
+
+function instellingen(){
+  const s = db.settings;
+  $("#main").innerHTML = `
+  <section><h2>Algemeen</h2><div class="grid" style="max-width:520px">
+    <label>Max reistijd enkele reis (min)<input id="maxR" type="number" min="0" step="5" value="${s.maxReistijd}"></label></div></section>
+  <section><h2>Documentversies</h2><p class="muted">Eén per regel. Gebruik dezelfde naam als je bestand (bijv. <code>cv-2026-11-forensisch</code>).</p>
+    <div class="grid" style="max-width:720px">
+      <label>Cv-versies<textarea id="cvs">${esc(s.cvVersies.join("\n"))}</textarea></label>
+      <label>Motivatiebrief-versies<textarea id="mots">${esc(s.motivatieVersies.join("\n"))}</textarea></label>
+    </div>
+    <div id="docUse" style="margin-top:10px"></div></section>
+  <section><h2>Data</h2><p class="muted">Je data staat alleen in deze browser. Exporteer regelmatig als back-up of om op een ander apparaat te importeren.</p>
+    <div class="toolbar"><button class="btn" id="exp">Exporteren (.json)</button><button class="btn" id="imp">Importeren (.json)</button><button class="btn" id="csv">Exporteren (.csv)</button><button class="btn danger" id="wipe">Alles wissen</button></div></section>`;
+  const use = {};
+  db.items.forEach(i=>{ [i.cv,i.motivatie].filter(Boolean).forEach(v=>use[v]=(use[v]||0)+1); });
+  $("#docUse").innerHTML = Object.keys(use).length ? `<span class="muted">Gebruik: </span>${Object.entries(use).map(([k,v])=>`<span class="pill">${esc(k)} × ${v}</span>`).join(" ")}` : "";
+  $("#maxR").onchange = e=>{ s.maxReistijd = Number(e.target.value)||0; save(); toast("Opgeslagen"); };
+  const lines = v => v.split("\n").map(x=>x.trim()).filter(Boolean);
+  $("#cvs").onchange = e=>{ s.cvVersies = lines(e.target.value); save(); toast("Opgeslagen"); };
+  $("#mots").onchange = e=>{ s.motivatieVersies = lines(e.target.value); save(); toast("Opgeslagen"); };
+  $("#exp").onclick = ()=>download(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), `stagetracker-backup-${today()}.json`);
+  $("#imp").onclick = ()=>pickFile(d=>{
+    if(!d || !Array.isArray(d.items)){ toast("Geen geldig back-upbestand"); return; }
+    if(!confirm(`${d.items.length} items importeren? Bestaande items met hetzelfde id worden overschreven.`)) return;
+    const map = new Map(db.items.map(i=>[i.id,i])); d.items.forEach(i=>map.set(i.id, normalize(i)));
+    db.items=[...map.values()]; if(d.settings) db.settings=Object.assign(db.settings,d.settings); if(d.genegeerd) db.genegeerd=[...new Set([...db.genegeerd,...d.genegeerd])];
+    save(); toast("Geïmporteerd"); render();
+  });
+  $("#csv").onclick = exportCsv;
+  $("#wipe").onclick = ()=>{ if(confirm("Alle data in deze browser wissen? Exporteer eerst een back-up.")){ db=blank(); save(); render(); } };
+}
+
+/* ---------- form ---------- */
+function normalize(x){
+  return {id:x.id||uid(), organisatie:x.organisatie||"", functie:x.functie||"", soort:x.soort||SOORTEN[0], sector:x.sector||"Forensisch",
+    locatie:x.locatie||"", reistijd:x.reistijd??"", deadline:x.deadline||"", start:x.start||"", link:x.link||"", contact:x.contact||"",
+    contactInfo:x.contactInfo||"", status:x.status||"geinteresseerd", followUp:x.followUp||"", cv:x.cv||"", motivatie:x.motivatie||"",
+    notities:x.notities||"", toegevoegd:x.toegevoegd||today(), historie:x.historie||[{datum:today(), status:x.status||"geinteresseerd"}]};
+}
+function opts(sel, list, val, withEmpty){
+  sel.innerHTML = (withEmpty?'<option value="">–</option>':"") + list.map(o=>{ const v=typeof o==="string"?o:o.id, l=typeof o==="string"?o:o.label; return `<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`; }).join("");
+  if(val && ![...sel.options].some(o=>o.value===val)) sel.insertAdjacentHTML("beforeend", `<option selected>${esc(val)}</option>`);
+}
+function openForm(id){
+  editingId = id || null;
+  const it = id ? db.items.find(i=>i.id===id) : normalize({});
+  const f = $("#form");
+  opts(f.soort, SOORTEN, it.soort); opts(f.sector, SECTOREN, it.sector); opts(f.status, STATUSES, it.status);
+  opts(f.cv, db.settings.cvVersies, it.cv, true); opts(f.motivatie, db.settings.motivatieVersies, it.motivatie, true);
+  ["organisatie","functie","locatie","reistijd","deadline","start","link","contact","contactInfo","followUp","notities"].forEach(k=>f[k].value = it[k] ?? "");
+  $("#dlgTitle").textContent = id ? it.organisatie : "Nieuwe plek";
+  $("#delBtn").style.display = id ? "" : "none";
+  $("#icsBtn").style.display = id ? "" : "none";
+  $("#histBox").innerHTML = id && it.historie?.length ? `<ul class="hist">${it.historie.map(h=>`<li>${fmtDate(h.datum)} – ${statusLabel(h.status)}</li>`).join("")}</ul>` : "";
+  $("#dlg").showModal();
+}
+$("#form").addEventListener("submit", e=>{
+  if(e.submitter && e.submitter.value!=="save") return;
+  const f = e.target, data = {};
+  ["organisatie","functie","soort","sector","locatie","reistijd","deadline","start","link","contact","contactInfo","status","followUp","cv","motivatie","notities"].forEach(k=>data[k]=f[k].value.trim());
+  if(data.reistijd!=="") data.reistijd = Number(data.reistijd);
+  if(editingId){
+    const it = db.items.find(i=>i.id===editingId); const newStatus = data.status; delete data.status;
+    Object.assign(it, data); setStatus(it.id, newStatus);
+  } else {
+    db.items.push(normalize(data));
+  }
+  save(); render(); toast("Opgeslagen");
+});
+$("#delBtn").onclick = ()=>{ if(!confirm("Deze plek verwijderen?")) return; db.items = db.items.filter(i=>i.id!==editingId); save(); $("#dlg").close(); render(); };
+$("#icsBtn").onclick = ()=>{ const it=db.items.find(i=>i.id===editingId); const ev=events().filter(e=>e.it.id===it.id); if(!ev.length){toast("Geen deadline of follow-up ingevuld");return;} downloadIcs(ev, `${it.organisatie.replace(/\W+/g,"-")}.ics`); };
+
+/* ---------- export helpers ---------- */
+function download(blob, name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
+function pickFile(cb){ const inp=$("#importFile"); inp.value=""; inp.onchange=()=>{ const file=inp.files[0]; if(!file) return; file.text().then(t=>{ try{cb(JSON.parse(t));}catch(e){toast("Bestand is geen geldige JSON");} }); }; inp.click(); }
+function icsEsc(s){ return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/[,;]/g, m=>"\\"+m); }
+function downloadIcs(ev, name){
+  const stamp = new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
+  const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//stagetracker//NL","CALSCALE:GREGORIAN"];
+  ev.forEach(e=>{
+    const d = e.datum.replace(/-/g,""); const nd = new Date(e.datum+"T00:00"); nd.setDate(nd.getDate()+1);
+    const d2 = `${nd.getFullYear()}${String(nd.getMonth()+1).padStart(2,"0")}${String(nd.getDate()).padStart(2,"0")}`;
+    lines.push("BEGIN:VEVENT", `UID:${e.it.id}-${e.type.replace(/\W/g,"")}@stagetracker`, `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`, "TRANSP:TRANSPARENT",
+      `SUMMARY:${icsEsc(`${e.type}: ${e.it.organisatie} – ${e.it.functie}`)}`,
+      `DESCRIPTION:${icsEsc(`${e.it.soort}\nStatus: ${statusLabel(e.it.status)}\n${e.it.link||""}`)}`,
+      ...(e.it.link?[`URL:${e.it.link}`]:[]),
+      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Herinnering","TRIGGER:-P3D","END:VALARM",
+      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Herinnering","TRIGGER:-P1D","END:VALARM",
+      "END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  download(new Blob([lines.join("\r\n")],{type:"text/calendar"}), name);
+}
+function exportCsv(){
+  const keys = ["organisatie","functie","soort","sector","locatie","reistijd","deadline","start","link","contact","contactInfo","status","followUp","cv","motivatie","notities","toegevoegd"];
+  const q = v => `"${String(v??"").replace(/"/g,'""')}"`;
+  const csv = [keys.join(";"), ...db.items.map(i=>keys.map(k=>q(k==="status"?statusLabel(i[k]):i[k])).join(";"))].join("\n");
+  download(new Blob(["\ufeff"+csv],{type:"text/csv"}), `stagetracker-${today()}.csv`);
+}
+
+/* ---------- init ---------- */
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{ view=b.dataset.view; render(); });
+$("#addBtn").onclick = ()=>openForm(null);
+render();
+loadInbox();
+</script>
+</body>
+</html>
