@@ -1,5 +1,7 @@
 # Stage- & vacaturetracker
 
+**[Open de app → svgbml.github.io/Stagetracker](https://svgbml.github.io/Stagetracker/)**
+
 Persoonlijke tracker voor stageplekken (jaar 3 + afstudeerstage), bijbanen en vacatures in forensische en biomedische labs. Statische web-app: één `index.html`, geen server of build nodig.
 
 ## Functies
@@ -20,7 +22,7 @@ Indeling als een mailprogramma: mappen links, lijst in het midden, leesvenster r
 ## Gebruiken
 1. Zet de bestanden in een GitHub-repo.
 2. *Settings → Pages → Deploy from branch* → `main` / root.
-3. Open `https://<gebruikersnaam>.github.io/<repo>/`.
+3. Open https://svgbml.github.io/Stagetracker/.
 
 Lokaal openen (`index.html` dubbelklikken) werkt ook, alleen laadt de inbox dan niet automatisch — gebruik *Scanbestand handmatig laden…*.
 
