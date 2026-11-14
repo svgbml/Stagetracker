@@ -362,7 +362,7 @@ function renderList(){
         <select id="bulkSt"><option value="">Status…</option>${Object.keys(ST).map(s=>`<option value="${s}">${ST[s].label}</option>`).join("")}</select>
         <select id="bulkLbl"><option value="">Label…</option>${LABELS.map(l=>`<option value="${esc(l.id)}">${esc(l.kort)}</option>`).join("")}</select>
         <button class="btn sm" data-bulk="negeren"><i class="ti ti-archive"></i>Negeren</button>`
-      : `<span class="title">${esc(title)}</span>${ui.label ? lblHtml(ui.label) : ""}<span class="sub" style="margin-left:6px">${arr.length}</span>`}
+      : `<span class="title">${esc(title)}</span>${ui.label ? lblHtml(ui.label) : ""}<span class="sub" style="margin-left:6px">${arr.length}</span>${!ui.smart && ui.folder==="nieuw" && lastScan ? `<span class="sub" style="margin-left:10px"><i class="ti ti-refresh"></i> laatste scan ${fmt(lastScan, true)}</span>` : ""}`}
       <span class="sp"></span>
       <select id="sort" title="Sorteren"><option value="deadline">Deadline</option><option value="actie">Volgende actie</option><option value="org">Organisatie</option><option value="reistijd">Reistijd</option><option value="toegevoegd">Nieuwste eerst</option></select>
     </div>
@@ -392,7 +392,7 @@ function renderList(){
 }
 function emptyState(){
   if(ui.q || ui.label || ui.smart) return `<div class="empty"><i class="ti ti-filter-off"></i>Niets gevonden met deze filters.</div>`;
-  if(ui.folder === "nieuw") return `<div class="empty"><i class="ti ti-inbox"></i>Geen nieuwe vondsten.<br><span class="sub">De wekelijkse scan zet hier nieuwe plekken neer.</span></div>`;
+  if(ui.folder === "nieuw") return `<div class="empty"><i class="ti ti-inbox"></i>Geen nieuwe vondsten.<br><span class="sub">De automatische scan zet hier nieuwe plekken neer${lastScan ? ` · laatste scan ${fmt(lastScan, true)}` : ""}.</span></div>`;
   return `<div class="empty"><i class="ti ti-briefcase"></i>Nog niets in deze map.<br><br><button class="btn" onclick="document.getElementById('newBtn').click()"><i class="ti ti-plus"></i>Plek toevoegen</button></div>`;
 }
 function bulk(kind, val){
@@ -562,7 +562,7 @@ function renderSearch(){
   const f = zoekForm(), q = zoekQuery(f);
   const std = new Set(DEFAULT_BRONNEN.map(b => b.url)), eigen = (db.settings.bronnen||[]).filter(b => b.url && !std.has(b.url));
   $("#mid").innerHTML = `
-    <div class="bar"><span class="title">Zoeken op het web</span><span class="sub">Zoek direct, zonder op de wekelijkse scan te wachten</span></div>
+    <div class="bar"><span class="title">Zoeken op het web</span><span class="sub">Zoek direct, naast de automatische scan</span></div>
     <div class="list" style="padding:16px 18px">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;max-width:760px">
         <label class="sub" style="display:grid;gap:3px">Soort<select class="f" id="zSoort" style="border-color:var(--line)">${opt(LABELS.map(l=>({v:l.id,l:l.kort})), f.soort)}</select></label>
@@ -633,8 +633,9 @@ function ingest(list){
   if(n){ save(); toast(`${n} nieuwe vondst${n>1?"en":""}`); }
   return n;
 }
+let lastScan = "";
 async function loadInbox(){
-  try{ const r = await fetch(INBOX_URL+"?t="+Date.now(), {cache:"no-store"}); if(r.ok){ const d = await r.json(); if(ingest(Array.isArray(d)?d:d.vondsten)) render(true); } }catch(e){}
+  try{ const r = await fetch(INBOX_URL+"?t="+Date.now(), {cache:"no-store"}); if(r.ok){ const d = await r.json(); const prev = lastScan; lastScan = (!Array.isArray(d) && d.bijgewerkt) || lastScan; if(ingest(Array.isArray(d)?d:d.vondsten) || prev !== lastScan) render(true); } }catch(e){}
 }
 
 /* ===== ics / export ===== */
@@ -749,6 +750,8 @@ document.addEventListener("keydown", e => {
 
 render();
 loadInbox();
+setInterval(() => { if(!document.hidden) loadInbox(); }, 10*60*1000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden) loadInbox(); });
 }
 </script>
 </body>

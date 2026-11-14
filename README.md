@@ -7,7 +7,7 @@ Persoonlijke tracker voor stageplekken (jaar 3 + afstudeerstage), bijbanen en va
 ## Functies
 Indeling als een mailprogramma: mappen links, lijst in het midden, leesvenster rechts.
 
-- **Mappen per status**: Nieuw (scanvondsten, vet = ongelezen), Interesse, Verstuurd, Gesprek, Resultaat, Genegeerd, Alles. Sleep een plek op een map om de status te wijzigen.
+- **Mappen per status**: Nieuw (vondsten van de automatische scan, vet = ongelezen; de app haalt nieuwe vondsten zelf op bij openen en elke 10 minuten), Interesse, Verstuurd, Gesprek, Resultaat, Genegeerd, Alles. Sleep een plek op een map om de status te wijzigen.
 - **Labels** per soort: Stage jaar 3, Afstudeerstage, Bijbaan, Vacature, Open sollicitatie.
 - **Zoeken op het web** (`Z`): kies soort, richting, plaats en trefwoorden en open direct gerichte zoekopdrachten op Google Jobs, Indeed, LinkedIn, Werken voor Nederland, NFI, Magnet.me, Nationale Vacaturebank, AcademicTransfer en ziekenhuizen in de regio. Gevonden plek? Plak de link en voeg hem toe aan *Nieuw*. Eigen bronnen (Instellingen) verschijnen hier ook; `{q}` in de URL wordt de zoekopdracht.
 - **Lijst of pijplijn**: compacte lijst (triage) of kolommen Interesse → Verstuurd → Gesprek → Resultaat (slepen).
