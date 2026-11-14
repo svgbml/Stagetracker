@@ -3,13 +3,18 @@
 Persoonlijke tracker voor stageplekken (jaar 3 + afstudeerstage), bijbanen en vacatures in forensische en biomedische labs. Statische web-app: één `index.html`, geen server of build nodig.
 
 ## Functies
-- **Overzicht** – organisatie, functie, soort, sector, locatie, reistijd (rood boven je maximum), deadline, contact, link; zoeken, filteren, sorteren.
-- **Status** – bord met kolommen Geïnteresseerd → Gesolliciteerd → Gesprek → Aangenomen / Afgewezen (slepen). Statushistorie per plek. Bij *Gesolliciteerd* wordt automatisch een follow-up over 10 dagen gezet.
-- **Herinneringen** – lijst van deadlines en follow-ups; export als `.ics` (met meldingen 3 en 1 dag vooraf) om in Google Agenda te importeren.
-- **Nieuwe vondsten** – inbox die `data/gevonden.json` leest (gevuld door de wekelijkse scan). Toevoegen of negeren.
-- **Bronnen** – lijst van sites/instellingen die gescand worden.
-- **Documenten** – per sollicitatie welke cv- en motivatiebriefversie is gebruikt.
-- **Data** – opgeslagen in de browser (localStorage). Export/import als JSON (back-up, ander apparaat) en export als CSV (Excel/Sheets).
+Indeling als een mailprogramma: mappen links, lijst in het midden, leesvenster rechts.
+
+- **Mappen per status**: Nieuw (scanvondsten, vet = ongelezen), Interesse, Verstuurd, Gesprek, Resultaat, Genegeerd, Alles. Sleep een plek op een map om de status te wijzigen.
+- **Labels** per soort: Stage jaar 3, Afstudeerstage, Bijbaan, Vacature, Open sollicitatie.
+- **Lijst of pijplijn**: compacte lijst (triage) of kolommen Interesse → Verstuurd → Gesprek → Resultaat (slepen).
+- **Leesvenster**: alle gegevens direct bewerkbaar, contactpersoon, cv-/briefversie, notities en tijdlijn.
+- **Volgende actie** per plek met datum, *Gedaan* en *+3 dagen*. Smart-mappen *Te laat* en *Deze week*. Bij *Verstuurd* komt automatisch een follow-up over 10 dagen.
+- **Zoeken met filters**: `label:afstuderen status:gesprek plaats:breda sector:forensisch deadline:<30d reistijd:<60`.
+- **Bulkacties**: selecteer meerdere plekken → gelezen, status, label of negeren.
+- **Sneltoetsen**: `J`/`K` navigeren, `X` selecteren, `E` negeren, `1`–`5` status, `U` ongelezen, `N` nieuw, `V` lijst/pijplijn, `/` zoeken, `?` overzicht.
+- **Agenda**: export van deadlines en volgende acties als `.ics` (meldingen 3 en 1 dag vooraf) voor Google Agenda.
+- **Data** in de browser (localStorage). Export/import JSON en export CSV via Instellingen. Data uit v1 wordt automatisch omgezet.
 
 ## Gebruiken
 1. Zet de bestanden in een GitHub-repo.

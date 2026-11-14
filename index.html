@@ -3,150 +3,213 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stage- & vacaturetracker</title>
+<title>Stagetracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 :root{
-  --bg:#f6f7f9; --panel:#fff; --text:#1d2330; --muted:#667085; --line:#e3e6ec;
-  --accent:#2f5fd0; --accent-soft:#e8eefc; --warn:#b54708; --warn-soft:#fef0e6;
-  --bad:#b42318; --bad-soft:#fdecea; --good:#067647; --good-soft:#e6f6ee;
-  --radius:10px; --font: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg:#f3f4f6; --pane:#ffffff; --side:#f7f8fa; --hover:#f1f3f6; --sel:#e8f0fe; --sel-bar:#1a66d6;
+  --text:#1f2328; --muted:#5f6b7a; --faint:#8b95a3; --line:#e4e7ec; --line-strong:#cfd5dd;
+  --accent:#1a66d6; --accent-soft:#e8f0fe; --accent-text:#1557b0;
+  --danger:#c4321f; --danger-soft:#fdecea; --warn:#9a5b00; --warn-soft:#fff3d6; --ok:#137333; --ok-soft:#e6f4ea;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",sans-serif;
+  --r:8px;
 }
-@media (prefers-color-scheme: dark){
-  :root{--bg:#14171d;--panel:#1c2028;--text:#e6e8ec;--muted:#98a1b2;--line:#2c323d;
-  --accent:#7aa2ff;--accent-soft:#22304f;--warn:#f5a25d;--warn-soft:#3a2a1c;
-  --bad:#f97066;--bad-soft:#3b1f1d;--good:#47cd89;--good-soft:#173528;}
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--font)}
-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-header h1{font-size:17px;margin:0;font-weight:650}
-nav{display:flex;gap:4px}
-nav button{background:none;border:0;padding:7px 12px;border-radius:8px;color:var(--muted);font:inherit;cursor:pointer}
-nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
-.spacer{flex:1}
-main{padding:18px 22px;max-width:1400px;margin:0 auto}
-button.btn{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer}
-button.btn:hover{border-color:var(--accent)}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button.small{padding:3px 8px;font-size:12px}
-button.danger{color:var(--bad)}
-input,select,textarea{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:100%}
-textarea{min-height:70px;resize:vertical}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.toolbar input,.toolbar select{width:auto}
-.toolbar input[type=search]{min-width:220px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
-.stat b{display:block;font-size:22px}
-.stat span{color:var(--muted);font-size:12px}
-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;white-space:nowrap}
-tr:last-child td{border-bottom:0}
-tbody tr:hover{background:var(--accent-soft);cursor:pointer}
-.muted{color:var(--muted)}
-.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;white-space:nowrap;background:var(--accent-soft);color:var(--accent)}
-.s-geinteresseerd{background:var(--accent-soft);color:var(--accent)}
-.s-gesolliciteerd{background:#efe8fd;color:#6941c6}
-.s-gesprek{background:var(--warn-soft);color:var(--warn)}
-.s-aangenomen{background:var(--good-soft);color:var(--good)}
-.s-afgewezen{background:var(--bad-soft);color:var(--bad)}
-@media (prefers-color-scheme: dark){.s-gesolliciteerd{background:#2d2445;color:#b9a3f5}}
-.due-late{color:var(--bad);font-weight:600}
-.due-soon{color:var(--warn);font-weight:600}
-.far{color:var(--bad)}
-.board{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:12px;overflow-x:auto}
-.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px;min-height:200px}
-.col h3{font-size:13px;margin:0 0 8px;display:flex;justify-content:space-between}
-.col.drop{outline:2px dashed var(--accent)}
-.card{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--bg);cursor:grab}
-.card .t{font-weight:600}
-.card .m{font-size:12px;color:var(--muted)}
-.list{display:flex;flex-direction:column;gap:8px}
-.item{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.item .grow{flex:1;min-width:200px}
-.empty{padding:30px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius)}
-dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--panel);color:var(--text);width:min(760px,94vw)}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111418; --pane:#1a1e24; --side:#15191e; --hover:#222830; --sel:#1d2b42; --sel-bar:#6ea2ff;
+  --text:#e6e9ee; --muted:#a1abb8; --faint:#76808d; --line:#2a3039; --line-strong:#3a424d;
+  --accent:#6ea2ff; --accent-soft:#1d2b42; --accent-text:#9cc0ff;
+  --danger:#ff8a7a; --danger-soft:#3a1f1c; --warn:#f2c46b; --warn-soft:#3a2f17; --ok:#7dd69a; --ok-soft:#173523;
+}}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 var(--font);overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.ti{font-size:16px;vertical-align:-3px}
+
+.app{display:grid;grid-template-rows:52px 1fr;height:100vh}
+.top{display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--pane);border-bottom:1px solid var(--line)}
+.brand{font-weight:600;font-size:15px;width:206px;display:flex;align-items:center;gap:8px}
+.brand i{color:var(--accent);font-size:20px}
+.search{flex:1;max-width:720px;display:flex;align-items:center;gap:8px;background:var(--hover);border:1px solid transparent;border-radius:999px;padding:0 14px;height:36px}
+.search:focus-within{background:var(--pane);border-color:var(--accent)}
+.search input{flex:1;border:0;background:none;outline:none;height:100%}
+.seg{display:flex;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:var(--pane);padding:6px 12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.seg button.on{background:var(--accent-soft);color:var(--accent-text);font-weight:600}
+.btn{border:1px solid var(--line-strong);background:var(--pane);border-radius:var(--r);padding:6px 12px;display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (prefers-color-scheme:dark){.btn.primary{color:#0b1220}}
+.btn.sm{padding:3px 9px;font-size:12px}
+.icon-btn{border:0;background:none;padding:6px;border-radius:6px;color:var(--muted)}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+
+.main{display:grid;grid-template-columns:220px minmax(0,1fr) 400px;min-height:0}
+.side{background:var(--side);border-right:1px solid var(--line);overflow:auto;padding:10px 8px}
+.side h4{margin:14px 10px 4px;font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+.nav{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:6px 10px;border-radius:6px;color:var(--text);text-align:left}
+.nav:hover{background:var(--hover)}
+.nav.on{background:var(--sel);color:var(--accent-text);font-weight:600}
+.nav .n{margin-left:auto;font-size:12px;color:var(--muted);font-weight:400}
+.nav .n.red{color:var(--danger);font-weight:600}
+.nav.drop{outline:2px dashed var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+
+.mid{display:flex;flex-direction:column;min-height:0;background:var(--pane);border-right:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:4px;padding:6px 10px;border-bottom:1px solid var(--line);min-height:42px}
+.bar .title{font-weight:600;font-size:14px;margin-right:8px}
+.bar .sp{flex:1}
+.bar select{border:1px solid var(--line);background:var(--pane);border-radius:6px;padding:3px 6px;color:var(--muted)}
+.list{overflow:auto;flex:1}
+.row{display:grid;grid-template-columns:22px 150px minmax(0,1fr) auto 74px;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+.row:hover{background:var(--hover)}
+.row.sel{background:var(--sel)}
+.row.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sel-bar)}
+.row.unread .org,.row.unread .fn{font-weight:700}
+.row input{margin:0}
+.org{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{color:var(--muted);font-weight:400}
+.date{text-align:right;font-size:12px;color:var(--muted);white-space:nowrap}
+.late{color:var(--danger)!important;font-weight:600}
+.soon{color:var(--warn)!important;font-weight:600}
+.lbl{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;vertical-align:1px}
+.st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;white-space:nowrap;background:var(--hover);color:var(--muted)}
+.st-nieuw{background:var(--accent-soft);color:var(--accent-text)}
+.st-gesolliciteerd{background:var(--ok-soft);color:var(--ok)}
+.st-gesprek{background:var(--warn-soft);color:var(--warn)}
+.st-aangenomen{background:var(--ok);color:var(--pane)}
+.st-afgewezen{background:var(--danger-soft);color:var(--danger)}
+.hint{padding:10px 12px;color:var(--faint);font-size:12px}
+kbd{border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:0 4px;font:11px var(--font);color:var(--muted);background:var(--pane)}
+.empty{padding:48px 24px;text-align:center;color:var(--muted)}
+.empty i{font-size:32px;display:block;margin-bottom:8px;color:var(--faint)}
+
+.board{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(4,minmax(165px,1fr));gap:10px;padding:10px;align-items:start;background:var(--bg)}
+.col{background:var(--side);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:120px;display:flex;flex-direction:column;gap:8px}
+.col.drop,.zone.drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.colh{display:flex;justify-content:space-between;font-weight:600;padding:2px 4px}
+.colh span{color:var(--muted);font-weight:400}
+.card{background:var(--pane);border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer}
+.card:hover{border-color:var(--line-strong)}
+.card.sel{box-shadow:0 0 0 2px var(--accent)}
+.card .t{display:flex;justify-content:space-between;gap:6px;font-weight:600}
+.card .s{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .a{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--muted)}
+.zone{border:1px dashed var(--line-strong);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:6px}
+.zone h5{margin:0;font-size:11px;color:var(--muted);font-weight:600;padding:0 2px}
+.av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex:none;background:var(--accent-soft);color:var(--accent-text)}
+.av.lg{width:34px;height:34px;font-size:12px}
+
+.detail{background:var(--pane);overflow:auto;min-height:0}
+.dhead{padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+.dhead input.big{font-size:18px;font-weight:600;border:0;background:none;width:100%;padding:2px 4px;margin-left:-4px;border-radius:4px}
+.dhead input.med{border:0;background:none;width:100%;color:var(--muted);padding:2px 4px;margin-left:-4px;border-radius:4px}
+.dhead input:hover,.dhead input:focus{background:var(--hover);outline:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{padding:2px 9px;border-radius:999px;font-size:11px;font-weight:500}
+.c-warn{background:var(--warn-soft);color:var(--warn)}
+.c-bad{background:var(--danger-soft);color:var(--danger)}
+.dsec{padding:12px 18px;border-bottom:1px solid var(--line)}
+.dsec h5{margin:0 0 8px;font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+.action{background:var(--side);border:1px solid var(--line);border-radius:10px;padding:10px}
+.action.late{border-color:var(--danger)}
+.fields{display:grid;grid-template-columns:96px minmax(0,1fr);gap:6px 10px;align-items:center}
+.fields label{color:var(--muted);font-size:12px}
+.f{width:100%;border:1px solid transparent;background:none;border-radius:6px;padding:4px 6px}
+.f:hover{border-color:var(--line)}
+.f:focus{border-color:var(--accent);outline:none;background:var(--pane)}
+textarea.f{min-height:70px;resize:vertical;border-color:var(--line)}
+.inrow{display:flex;gap:6px;align-items:center}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:flex;gap:10px;padding:3px 0;font-size:12px;color:var(--muted)}
+.tl li b{font-weight:500;color:var(--text);min-width:70px}
+.dfoot{display:flex;gap:6px;flex-wrap:wrap;padding:12px 18px}
+.back{display:none}
+
+dialog{border:1px solid var(--line);border-radius:12px;padding:0;background:var(--pane);color:var(--text);width:min(720px,94vw);max-height:90vh}
 dialog::backdrop{background:rgba(0,0,0,.35)}
-.dlg-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.dlg-head h2{margin:0;font-size:16px}
-.dlg-body{padding:16px 18px;max-height:70vh;overflow:auto}
-.dlg-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
-.grid .full{grid-column:1/-1}
-label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
-.hist{font-size:12px;color:var(--muted);margin:6px 0 0;padding-left:18px}
-section h2{font-size:15px;margin:22px 0 10px}
-.badge{background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;margin-left:4px}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.show{opacity:1}
-@media (max-width:700px){.grid{grid-template-columns:1fr}.board{grid-template-columns:repeat(5,220px)}}
+.dlgh{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.dlgh h2{margin:0;font-size:16px}
+.dlgb{padding:6px 18px 18px;overflow:auto;max-height:calc(90vh - 60px)}
+.dlgb h3{font-size:13px;margin:16px 0 8px}
+.dlgb .in{border:1px solid var(--line-strong);border-radius:6px;padding:6px 8px;background:var(--pane);width:100%}
+.dlgb textarea.in{min-height:80px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bron{display:grid;grid-template-columns:1fr 1.6fr auto;gap:6px;margin-bottom:6px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--pane);padding:8px 14px;border-radius:8px;opacity:0;transition:.2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+@media (max-width:1180px){.main{grid-template-columns:200px minmax(0,1fr) 340px}.row{grid-template-columns:22px 120px minmax(0,1fr) 70px}.row .stc{display:none}}
+@media (max-width:860px){
+  .brand{width:auto}.brand span{display:none}
+  .seg button span,.top .btn.primary span,#icsBtn{display:none}
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .side{display:flex;gap:4px;overflow-x:auto;padding:6px 8px;border-right:0;border-bottom:1px solid var(--line)}
+  .side h4{display:none}.nav{width:auto;white-space:nowrap;flex:none}.nav .n{margin-left:4px}.hint{display:none}.search{padding:0 10px}
+  .detail{display:none}
+  .app.show-detail .mid{display:none}.app.show-detail .detail{display:block}.app.show-detail .side{display:none}
+  .back{display:inline-flex}
+  .row{grid-template-columns:20px minmax(0,1fr) 64px}.row .org{display:none}
+  .row .fn .orgm{display:inline}
+  .board{grid-template-columns:repeat(4,220px)}
+  .g2{grid-template-columns:1fr}
+}
+.orgm{display:none}
 </style>
 </head>
 <body>
-<header>
-  <h1>Stage- & vacaturetracker</h1>
-  <nav id="tabs">
-    <button data-view="overzicht" class="active">Overzicht</button>
-    <button data-view="bord">Status</button>
-    <button data-view="agenda">Herinneringen</button>
-    <button data-view="inbox">Nieuwe vondsten<span id="inboxBadge"></span></button>
-    <button data-view="bronnen">Bronnen</button>
-    <button data-view="instellingen">Instellingen</button>
-  </nav>
-  <div class="spacer"></div>
-  <button class="btn primary" id="addBtn">+ Toevoegen</button>
-</header>
-
-<main id="main"></main>
-
-<dialog id="dlg">
-  <form method="dialog" id="form">
-    <div class="dlg-head"><h2 id="dlgTitle">Plek</h2><button class="btn small" value="cancel">Sluiten</button></div>
-    <div class="dlg-body">
-      <div class="grid">
-        <label>Organisatie<input name="organisatie" required></label>
-        <label>Functie / stage<input name="functie" required></label>
-        <label>Soort<select name="soort"></select></label>
-        <label>Sector<select name="sector"></select></label>
-        <label>Locatie<input name="locatie" placeholder="plaats"></label>
-        <label>Reistijd enkele reis (min)<input name="reistijd" type="number" min="0" step="5"></label>
-        <label>Deadline<input name="deadline" type="date"></label>
-        <label>Startdatum<input name="start" type="date"></label>
-        <label class="full">Link<input name="link" type="url" placeholder="https://"></label>
-        <label>Contactpersoon<input name="contact"></label>
-        <label>Contact e-mail / telefoon<input name="contactInfo"></label>
-        <label>Status<select name="status"></select></label>
-        <label>Follow-up op<input name="followUp" type="date"></label>
-        <label>Cv-versie<select name="cv"></select></label>
-        <label>Motivatiebrief-versie<select name="motivatie"></select></label>
-        <label class="full">Notities<textarea name="notities"></textarea></label>
-      </div>
-      <div id="histBox"></div>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand"><i class="ti ti-briefcase"></i><span>Stagetracker</span></div>
+    <label class="search"><i class="ti ti-search"></i><input id="q" placeholder="Zoeken of filteren, bijv. label:afstuderen deadline:<30d" autocomplete="off"><button class="icon-btn" id="qClear" title="Wissen" hidden><i class="ti ti-x"></i></button></label>
+    <div class="seg" role="tablist">
+      <button id="vList" class="on" title="Lijst (V)"><i class="ti ti-list"></i><span>Lijst</span></button>
+      <button id="vBoard" title="Pijplijn (V)"><i class="ti ti-layout-columns"></i><span>Pijplijn</span></button>
     </div>
-    <div class="dlg-foot">
-      <button class="btn danger" type="button" id="delBtn">Verwijderen</button>
-      <button class="btn" type="button" id="icsBtn">Naar agenda (.ics)</button>
-      <div class="spacer"></div>
-      <button class="btn primary" value="save" id="saveBtn">Opslaan</button>
-    </div>
-  </form>
-</dialog>
+    <button class="btn primary" id="newBtn" title="Nieuwe plek (N)"><i class="ti ti-plus"></i><span>Nieuw</span></button>
+    <button class="icon-btn" id="icsBtn" title="Herinneringen naar agenda (.ics)"><i class="ti ti-calendar-down"></i></button>
+    <button class="icon-btn" id="setBtn" title="Instellingen"><i class="ti ti-settings"></i></button>
+  </header>
+  <div class="main">
+    <nav class="side" id="side"></nav>
+    <section class="mid" id="mid"></section>
+    <section class="detail" id="detail"></section>
+  </div>
+</div>
 
-<input type="file" id="importFile" accept=".json,application/json" hidden>
+<dialog id="dlg"></dialog>
+<input type="file" id="file" accept=".json,application/json" hidden>
 <div class="toast" id="toast"></div>
 
 <script>
+{
 "use strict";
-/* ---------- constants ---------- */
-const STATUSES = [
-  {id:"geinteresseerd", label:"Geïnteresseerd"},
-  {id:"gesolliciteerd", label:"Gesolliciteerd"},
-  {id:"gesprek",        label:"Gesprek"},
-  {id:"aangenomen",     label:"Aangenomen"},
-  {id:"afgewezen",      label:"Afgewezen"}
+/* ===== constants ===== */
+const ST = {
+  nieuw:{label:"Nieuw"}, geinteresseerd:{label:"Interesse"}, gesolliciteerd:{label:"Verstuurd"},
+  gesprek:{label:"Gesprek"}, aangenomen:{label:"Aangenomen"}, afgewezen:{label:"Afgewezen"}, genegeerd:{label:"Genegeerd"}
+};
+const OPEN = ["nieuw","geinteresseerd","gesolliciteerd","gesprek"];
+const FOLDERS = [
+  {id:"nieuw", label:"Nieuw", icon:"ti-inbox", st:["nieuw"]},
+  {id:"interesse", label:"Interesse", icon:"ti-star", st:["geinteresseerd"]},
+  {id:"verstuurd", label:"Verstuurd", icon:"ti-send", st:["gesolliciteerd"]},
+  {id:"gesprek", label:"Gesprek", icon:"ti-users", st:["gesprek"]},
+  {id:"resultaat", label:"Resultaat", icon:"ti-circle-check", st:["aangenomen","afgewezen"]},
+  {id:"genegeerd", label:"Genegeerd", icon:"ti-archive", st:["genegeerd"]},
+  {id:"alles", label:"Alles", icon:"ti-stack-2", st:null}
 ];
-const SOORTEN = ["Stage jaar 3","Afstudeerstage","Bijbaan","Vacature (na afstuderen)","Open sollicitatie"];
+const DROP_STATUS = {nieuw:"nieuw", interesse:"geinteresseerd", verstuurd:"gesolliciteerd", gesprek:"gesprek", genegeerd:"genegeerd"};
+const LABELS = [
+  {id:"Stage jaar 3", kort:"Stage jr 3", c:"#7F77DD", bg:"#EEEDFE", fg:"#3C3489"},
+  {id:"Afstudeerstage", kort:"Afstuderen", c:"#1D9E75", bg:"#E1F5EE", fg:"#085041"},
+  {id:"Bijbaan", kort:"Bijbaan", c:"#D85A30", bg:"#FAECE7", fg:"#712B13"},
+  {id:"Vacature (na afstuderen)", kort:"Vacature", c:"#888780", bg:"#F1EFE8", fg:"#444441"},
+  {id:"Open sollicitatie", kort:"Open sollicitatie", c:"#378ADD", bg:"#E6F1FB", fg:"#0C447C"}
+];
 const SECTOREN = ["Forensisch","Ziekenhuislab","Onderzoeksinstituut","Universiteit","Industrie / farma","Overheid","Overig"];
 const STORE = "stagetracker.v1";
 const INBOX_URL = "data/gevonden.json";
@@ -154,290 +217,457 @@ const DEFAULT_BRONNEN = [
   {naam:"NFI – werken & stage", url:"https://www.google.com/search?q=NFI+Nederlands+Forensisch+Instituut+stage+hbo"},
   {naam:"Forensische labs (NL)", url:"https://www.google.com/search?q=forensisch+laboratorium+stage+hbo+Nederland"},
   {naam:"Ziekenhuislabs Brabant", url:"https://www.google.com/search?q=ziekenhuis+laboratorium+stage+hbo+Brabant"},
-  {naam:"Avans stagebank", url:"", notitie:"Via Brightspace / opleiding – link zelf invullen"},
-  {naam:"Magnet.me – lab stages", url:"https://magnet.me/nl-NL/"},
+  {naam:"Avans stagebank", url:""},
+  {naam:"Magnet.me", url:"https://magnet.me/nl-NL/"},
   {naam:"Indeed – laboratorium stage", url:"https://nl.indeed.com/q-laboratorium-stage-vacatures.html"}
 ];
-const MAX_REISTIJD_DEFAULT = 90;
 
-/* ---------- state ---------- */
-let db = load();
-let view = "overzicht";
-let editingId = null;
-let sort = {key:"deadline", dir:1};
-let filters = {q:"", soort:"", status:"", actief:true};
-let inbox = [];
-
-function blank(){
-  return {items:[], settings:{maxReistijd:MAX_REISTIJD_DEFAULT, cvVersies:["cv-v1"], motivatieVersies:["motivatie-algemeen-v1"], bronnen:DEFAULT_BRONNEN}, genegeerd:[]};
-}
-function load(){
-  try{ const d = JSON.parse(localStorage.getItem(STORE)); if(d && d.items) return Object.assign(blank(), d); }catch(e){}
-  return blank();
-}
-function save(){ try{ localStorage.setItem(STORE, JSON.stringify(db)); }catch(e){ toast("Opslaan in browser mislukt – exporteer je data"); } }
-const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+/* ===== helpers ===== */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const today = () => new Date().toISOString().slice(0,10);
-function daysUntil(d){ if(!d) return null; return Math.round((new Date(d+"T00:00") - new Date(today()+"T00:00"))/86400000); }
-function fmtDate(d){ if(!d) return ""; return new Date(d+"T00:00").toLocaleDateString("nl-NL",{day:"numeric",month:"short",year:"numeric"}); }
-function statusLabel(id){ return (STATUSES.find(s=>s.id===id)||{}).label || id; }
-function pill(id){ return `<span class="pill s-${id}">${statusLabel(id)}</span>`; }
-function dueHtml(d, done){
-  if(!d) return '<span class="muted">–</span>';
-  const n = daysUntil(d);
-  let cls = "", extra = "";
-  if(!done){ if(n<0){cls="due-late";extra=` (${-n}d geleden)`} else if(n<=7){cls="due-soon";extra=n===0?" (vandaag)":` (nog ${n}d)`} }
-  return `<span class="${cls}">${fmtDate(d)}${extra}</span>`;
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const today = () => iso(new Date());
+const addDays = (s,n) => { const d = s ? new Date(s+"T00:00") : new Date(); d.setDate(d.getDate()+n); return iso(d); };
+const days = d => d ? Math.round((new Date(d+"T00:00") - new Date(today()+"T00:00"))/864e5) : null;
+const fmt = (d, long) => d ? new Date(d+"T00:00").toLocaleDateString("nl-NL", long ? {weekday:"short",day:"numeric",month:"short",year:"numeric"} : {day:"numeric",month:"short"}) : "";
+const labelOf = id => LABELS.find(l => l.id === id) || {id, kort:id||"–", c:"#888780", bg:"#F1EFE8", fg:"#444441"};
+const lblHtml = id => { const l = labelOf(id); return `<span class="lbl" style="background:${l.bg};color:${l.fg}">${esc(l.kort)}</span>`; };
+const stHtml = s => `<span class="st st-${s}">${ST[s]?.label || s}</span>`;
+const initials = n => (n||"").split(/\s+/).filter(w => w && !/^(van|de|der|den|het|ten|ter)$/i.test(w)).map(w => w[0]).join("").slice(0,2).toUpperCase() || "?";
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+const isOpen = it => OPEN.includes(it.status);
+
+/* ===== data ===== */
+function blank(){ return {versie:2, items:[], settings:{maxReistijd:90, cvVersies:["cv-v1"], motivatieVersies:["motivatie-algemeen-v1"], bronnen:DEFAULT_BRONNEN}, genegeerd:[]}; }
+function migrate(it){
+  it = Object.fromEntries(Object.entries(it||{}).filter(([,v]) => v !== undefined));
+  const o = Object.assign({id:uid(), organisatie:"", functie:"", soort:"Stage jaar 3", sector:"Forensisch", locatie:"", reistijd:"", deadline:"", start:"", link:"",
+    contact:"", contactFunctie:"", contactInfo:"", status:"geinteresseerd", actie:{tekst:"",datum:""}, cv:"", motivatie:"", notities:"",
+    toegevoegd:today(), gelezen:true, bron:"handmatig", historie:[]}, it);
+  if(!o.actie || typeof o.actie !== "object") o.actie = {tekst:"",datum:""};
+  if(o.followUp && !o.actie.datum){ o.actie = {tekst:"Follow-up sturen", datum:o.followUp}; }
+  delete o.followUp;
+  o.historie = (o.historie||[]).map(h => h.tekst ? h : {datum:h.datum, tekst:`Status: ${ST[h.status]?.label || h.status}`});
+  if(!ST[o.status]) o.status = "geinteresseerd";
+  return o;
 }
-const isClosed = it => it.status==="aangenomen" || it.status==="afgewezen";
-function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
-function reistijdHtml(m){
-  if(m===""||m==null) return '<span class="muted">–</span>';
-  const far = Number(m) > Number(db.settings.maxReistijd);
-  return `<span class="${far?"far":""}" title="${far?"Boven je max reistijd":""}">${m} min</span>`;
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(STORE)); if(d && Array.isArray(d.items)){ const b = blank(); b.items = d.items.map(migrate); b.settings = Object.assign(b.settings, d.settings||{}); b.genegeerd = d.genegeerd||[]; return b; } }catch(e){}
+  return blank();
+}
+let db = load();
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(db)); }catch(e){ toast("Opslaan mislukt – exporteer je data"); } }
+const get = id => db.items.find(i => i.id === id);
+function log(it, tekst){ it.historie.unshift({datum:today(), tekst}); }
+function setStatus(it, s){
+  if(!it || it.status === s) return;
+  it.status = s; it.gelezen = true; log(it, `Status: ${ST[s].label}`);
+  if(s === "gesolliciteerd" && !it.actie.tekst){ it.actie = {tekst:"Follow-up sturen", datum:addDays(today(),10)}; toast("Volgende actie: follow-up over 10 dagen"); }
+  if(!isOpen(it)) it.actie = {tekst:"", datum:""};
 }
 
-/* ---------- views ---------- */
-function render(){
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
-  const n = inbox.filter(x=>!known(x)).length;
-  $("#inboxBadge").innerHTML = n ? `<span class="badge">${n}</span>` : "";
-  ({overzicht, bord, agenda, inbox:inboxView, bronnen, instellingen})[view]();
-}
+/* ===== state ===== */
+const ui = {view:"list", folder:"nieuw", label:null, smart:null, q:"", sel:null, checked:new Set(), sort:"deadline"};
+try{ Object.assign(ui, JSON.parse(localStorage.getItem(STORE+".ui")||"{}"), {checked:new Set(), q:""}); }catch(e){}
+function saveUi(){ try{ localStorage.setItem(STORE+".ui", JSON.stringify({view:ui.view, folder:ui.folder, label:ui.label, smart:ui.smart, sort:ui.sort})); }catch(e){} }
+if(!db.items.some(i => i.status === "nieuw") && ui.folder === "nieuw" && db.items.length) ui.folder = "interesse";
 
-function filtered(){
-  const q = filters.q.toLowerCase();
-  return db.items.filter(it=>{
-    if(filters.actief && isClosed(it)) return false;
-    if(filters.soort && it.soort!==filters.soort) return false;
-    if(filters.status && it.status!==filters.status) return false;
-    if(q && !`${it.organisatie} ${it.functie} ${it.locatie} ${it.notities}`.toLowerCase().includes(q)) return false;
-    return true;
-  }).sort((a,b)=>{
-    let x=a[sort.key]??"", y=b[sort.key]??"";
-    if(sort.key==="reistijd"){x=Number(x)||9999;y=Number(y)||9999;}
-    if(sort.key==="deadline"){x=x||"9999";y=y||"9999";}
-    if(sort.key==="status"){x=STATUSES.findIndex(s=>s.id===a.status);y=STATUSES.findIndex(s=>s.id===b.status);}
-    return (x>y?1:x<y?-1:0)*sort.dir;
+/* ===== filtering ===== */
+function parseQuery(q){
+  const f = {text:[], label:null, status:null, plaats:null, sector:null, deadline:null, reistijd:null};
+  q.trim().split(/\s+/).filter(Boolean).forEach(tok => {
+    const m = tok.match(/^(label|status|plaats|sector|deadline|reistijd):(.+)$/i);
+    if(!m){ f.text.push(tok.toLowerCase()); return; }
+    const k = m[1].toLowerCase(), v = m[2].toLowerCase();
+    if(k === "deadline" || k === "reistijd"){ const n = parseInt(v.replace(/[^\d]/g,"")); if(!isNaN(n)) f[k] = n; }
+    else f[k] = v;
   });
+  return f;
+}
+function matchQuery(it, f){
+  if(f.label && !(labelOf(it.soort).kort.toLowerCase().includes(f.label) || it.soort.toLowerCase().startsWith(f.label))) return false;
+  if(f.status && !(`${it.status} ${ST[it.status].label}`.toLowerCase().includes(f.status))) return false;
+  if(f.plaats && !it.locatie.toLowerCase().includes(f.plaats)) return false;
+  if(f.sector && !it.sector.toLowerCase().includes(f.sector)) return false;
+  if(f.deadline != null){ const d = days(it.deadline); if(d == null || d > f.deadline) return false; }
+  if(f.reistijd != null && !(Number(it.reistijd) <= f.reistijd)) return false;
+  const hay = `${it.organisatie} ${it.functie} ${it.locatie} ${it.contact} ${it.notities} ${it.actie.tekst}`.toLowerCase();
+  return f.text.every(t => hay.includes(t));
+}
+function actieDue(it){ return isOpen(it) && it.actie.datum ? days(it.actie.datum) : null; }
+function smartMatch(it, s){
+  const d = actieDue(it);
+  if(s === "telaat") return d != null && d < 0;
+  if(s === "week") return d != null && d >= 0 && d <= 7 || (isOpen(it) && ["nieuw","geinteresseerd"].includes(it.status) && it.deadline && days(it.deadline) >= 0 && days(it.deadline) <= 7);
+  return true;
+}
+function baseFilter(){
+  const f = parseQuery(ui.q);
+  return db.items.filter(it => matchQuery(it, f) && (!ui.label || it.soort === ui.label));
+}
+function visible(){
+  let arr = baseFilter();
+  if(ui.smart) arr = arr.filter(it => smartMatch(it, ui.smart));
+  else { const fo = FOLDERS.find(x => x.id === ui.folder); if(fo && fo.st) arr = arr.filter(it => fo.st.includes(it.status)); }
+  const key = it => ui.sort === "deadline" ? (it.deadline || "9999") : ui.sort === "actie" ? (it.actie.datum || "9999") : ui.sort === "org" ? it.organisatie.toLowerCase() : ui.sort === "reistijd" ? (Number(it.reistijd)||9999) : (it.toegevoegd||"");
+  arr.sort((a,b) => { const x = key(a), y = key(b); const r = x > y ? 1 : x < y ? -1 : 0; return ui.sort === "toegevoegd" ? -r : r; });
+  return arr;
 }
 
-function overzicht(){
-  const all = db.items;
-  const cnt = id => all.filter(i=>i.status===id).length;
-  const soon = all.filter(i=>!isClosed(i) && i.deadline && daysUntil(i.deadline)>=0 && daysUntil(i.deadline)<=14).length;
-  const rows = filtered();
-  const cols = [["organisatie","Organisatie"],["functie","Functie / stage"],["soort","Soort"],["locatie","Locatie"],["reistijd","Reistijd"],["deadline","Deadline"],["status","Status"],["contact","Contact"],["link","Link"]];
-  $("#main").innerHTML = `
-  <div class="stats">
-    <div class="stat"><b>${all.length}</b><span>Totaal</span></div>
-    ${STATUSES.map(s=>`<div class="stat"><b>${cnt(s.id)}</b><span>${s.label}</span></div>`).join("")}
-    <div class="stat"><b>${soon}</b><span>Deadline ≤ 14 dagen</span></div>
-  </div>
-  <div class="toolbar">
-    <input type="search" id="fq" placeholder="Zoek organisatie, functie, plaats…" value="${esc(filters.q)}">
-    <select id="fs"><option value="">Alle soorten</option>${SOORTEN.map(s=>`<option ${filters.soort===s?"selected":""}>${s}</option>`).join("")}</select>
-    <select id="fst"><option value="">Alle statussen</option>${STATUSES.map(s=>`<option value="${s.id}" ${filters.status===s.id?"selected":""}>${s.label}</option>`).join("")}</select>
-    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--text)"><input type="checkbox" id="fa" style="width:auto" ${filters.actief?"checked":""}> alleen lopend</label>
-  </div>
-  ${rows.length ? `<table><thead><tr>${cols.map(([k,l])=>`<th data-k="${k}">${l}${sort.key===k?(sort.dir>0?" ▲":" ▼"):""}</th>`).join("")}</tr></thead><tbody>
-  ${rows.map(it=>`<tr data-id="${it.id}">
-    <td><b>${esc(it.organisatie)}</b><div class="muted" style="font-size:12px">${esc(it.sector||"")}</div></td>
-    <td>${esc(it.functie)}</td><td>${esc(it.soort)}</td><td>${esc(it.locatie)}</td>
-    <td>${reistijdHtml(it.reistijd)}</td><td>${dueHtml(it.deadline, it.status!=="geinteresseerd")}</td>
-    <td>${pill(it.status)}</td><td>${esc(it.contact)}</td>
-    <td>${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">open ↗</a>`:""}</td></tr>`).join("")}
-  </tbody></table>` : `<div class="empty">${db.items.length?"Geen resultaten met deze filters.":"Nog niets toegevoegd. Klik op <b>+ Toevoegen</b> of kijk bij <b>Nieuwe vondsten</b>."}</div>`}`;
-  $("#fq").oninput = e=>{filters.q=e.target.value; const pos=e.target.selectionStart; overzicht(); const f=$("#fq"); f.focus(); f.setSelectionRange(pos,pos);};
-  $("#fs").onchange = e=>{filters.soort=e.target.value; overzicht();};
-  $("#fst").onchange = e=>{filters.status=e.target.value; overzicht();};
-  $("#fa").onchange = e=>{filters.actief=e.target.checked; overzicht();};
-  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k; sort = {key:k, dir: sort.key===k ? -sort.dir : 1}; overzicht();});
-  document.querySelectorAll("tbody tr").forEach(tr=>tr.onclick=()=>openForm(tr.dataset.id));
-}
-
-function bord(){
-  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Sleep een kaart naar een andere kolom om de status te wijzigen.</p><div class="board">${STATUSES.map(s=>{
-    const its = db.items.filter(i=>i.status===s.id).sort((a,b)=>(a.deadline||"9999")>(b.deadline||"9999")?1:-1);
-    return `<div class="col" data-s="${s.id}"><h3>${s.label}<span class="muted">${its.length}</span></h3>
-      ${its.map(it=>`<div class="card" draggable="true" data-id="${it.id}"><div class="t">${esc(it.organisatie)}</div><div class="m">${esc(it.functie)}</div><div class="m">${esc(it.soort)}${it.deadline?" · "+dueHtml(it.deadline, s.id!=="geinteresseerd"):""}</div></div>`).join("")}
-    </div>`;}).join("")}</div>`;
-  document.querySelectorAll(".card").forEach(c=>{
-    c.ondragstart = e=>e.dataTransfer.setData("text/plain", c.dataset.id);
-    c.onclick = ()=>openForm(c.dataset.id);
+/* ===== render: sidebar ===== */
+function renderSide(){
+  const base = baseFilter();
+  const cnt = st => base.filter(i => st ? st.includes(i.status) : true).length;
+  const unread = base.filter(i => i.status === "nieuw" && !i.gelezen).length;
+  const late = base.filter(i => smartMatch(i,"telaat")).length, week = base.filter(i => smartMatch(i,"week")).length;
+  const folders = ui.view === "board" ? FOLDERS.filter(f => ["nieuw","genegeerd","alles"].includes(f.id)) : FOLDERS;
+  $("#side").innerHTML = `
+    <h4>Mappen</h4>
+    ${folders.map(f => `<button class="nav ${!ui.smart && ui.folder===f.id ? "on":""}" data-folder="${f.id}"><i class="ti ${f.icon}"></i>${f.label}<span class="n">${f.id==="nieuw" && unread ? `<b style="color:var(--accent-text)">${unread}</b>` : (cnt(f.st)||"")}</span></button>`).join("")}
+    <h4>Labels</h4>
+    ${LABELS.map(l => `<button class="nav ${ui.label===l.id ? "on":""}" data-label="${esc(l.id)}"><span class="dot" style="background:${l.c}"></span>${esc(l.kort)}<span class="n">${db.items.filter(i=>i.soort===l.id && isOpen(i)).length || ""}</span></button>`).join("")}
+    <h4>Volgende acties</h4>
+    <button class="nav ${ui.smart==="telaat"?"on":""}" data-smart="telaat"><i class="ti ti-alert-circle"></i>Te laat<span class="n ${late?"red":""}">${late||""}</span></button>
+    <button class="nav ${ui.smart==="week"?"on":""}" data-smart="week"><i class="ti ti-clock"></i>Deze week<span class="n">${week||""}</span></button>`;
+  $("#side").querySelectorAll("[data-folder]").forEach(b => {
+    b.onclick = () => { ui.folder = b.dataset.folder; ui.smart = null; ui.checked.clear(); saveUi(); render(); };
+    const st = DROP_STATUS[b.dataset.folder];
+    if(st) dropTarget(b, id => { setStatus(get(id), st); save(); render(); });
   });
-  document.querySelectorAll(".col").forEach(col=>{
-    col.ondragover = e=>{e.preventDefault(); col.classList.add("drop");};
-    col.ondragleave = ()=>col.classList.remove("drop");
-    col.ondrop = e=>{e.preventDefault(); col.classList.remove("drop"); setStatus(e.dataTransfer.getData("text/plain"), col.dataset.s); bord();};
-  });
+  $("#side").querySelectorAll("[data-label]").forEach(b => b.onclick = () => { ui.label = ui.label === b.dataset.label ? null : b.dataset.label; saveUi(); render(); });
+  $("#side").querySelectorAll("[data-smart]").forEach(b => b.onclick = () => { ui.smart = ui.smart === b.dataset.smart ? null : b.dataset.smart; saveUi(); render(); });
 }
 
-function setStatus(id, status){
-  const it = db.items.find(i=>i.id===id); if(!it || it.status===status) return;
-  it.status = status; it.historie = it.historie||[]; it.historie.push({datum:today(), status});
-  if(status==="gesolliciteerd" && !it.followUp){ const d=new Date(); d.setDate(d.getDate()+10); it.followUp=d.toISOString().slice(0,10); toast("Follow-up gezet op over 10 dagen"); }
-  save();
-}
-
-function events(){
-  const ev=[];
-  db.items.forEach(it=>{
-    if(isClosed(it)) return;
-    if(it.deadline && it.status==="geinteresseerd") ev.push({it, type:"Deadline sollicitatie", datum:it.deadline});
-    if(it.followUp) ev.push({it, type:"Follow-up", datum:it.followUp});
-  });
-  return ev.sort((a,b)=>a.datum>b.datum?1:-1);
-}
-function agenda(){
-  const ev = events();
-  $("#main").innerHTML = `<div class="toolbar"><button class="btn primary" id="icsAll">Alles naar agenda (.ics)</button><span class="muted">Importeer het .ics-bestand in Google Agenda (Instellingen → Importeren). Elk item krijgt een melding 3 dagen en 1 dag vooraf.</span></div>
-  ${ev.length?`<div class="list">${ev.map(e=>`<div class="item"><div style="width:150px">${dueHtml(e.datum)}</div><div class="grow"><b>${e.type}</b> – ${esc(e.it.organisatie)} · ${esc(e.it.functie)}</div>${pill(e.it.status)}<button class="btn small" data-id="${e.it.id}">Open</button></div>`).join("")}</div>`:`<div class="empty">Geen openstaande deadlines of follow-ups.</div>`}`;
-  $("#icsAll").onclick = ()=>downloadIcs(ev, "stagetracker-herinneringen.ics");
-  document.querySelectorAll(".item button[data-id]").forEach(b=>b.onclick=()=>openForm(b.dataset.id));
-}
-
-/* ---------- inbox (weekly scan results) ---------- */
-const keyOf = x => `${(x.organisatie||"").toLowerCase().trim()}|${(x.functie||"").toLowerCase().trim()}|${(x.link||"").trim()}`;
-function known(x){ const k=keyOf(x); return db.genegeerd.includes(k) || db.items.some(i=>keyOf(i)===k || (x.link && i.link===x.link)); }
-async function loadInbox(){
-  try{ const r = await fetch(INBOX_URL+"?t="+Date.now(), {cache:"no-store"}); if(r.ok){ const d = await r.json(); inbox = Array.isArray(d) ? d : (d.vondsten||[]); } }catch(e){ inbox = []; }
-  render();
-}
-function inboxView(){
-  const nieuw = inbox.filter(x=>!known(x));
-  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Vondsten uit de wekelijkse scan (<code>${INBOX_URL}</code> in je repo). Toevoegen zet ze op <i>Geïnteresseerd</i>; negeren onthoudt de app.</p>
-  <div class="toolbar"><button class="btn" id="reloadInbox">Opnieuw laden</button><button class="btn" id="loadLocalInbox">Scanbestand handmatig laden…</button></div>
-  ${nieuw.length?`<div class="list">${nieuw.map((x,i)=>`<div class="item"><div class="grow"><b>${esc(x.organisatie)}</b> – ${esc(x.functie)}<div class="muted" style="font-size:12px">${esc(x.soort||"")} · ${esc(x.locatie||"")}${x.reistijd?" · ~"+x.reistijd+" min":""}${x.deadline?" · deadline "+fmtDate(x.deadline):""}${x.gevondenOp?" · gevonden "+fmtDate(x.gevondenOp):""}</div>${x.notities?`<div style="font-size:12px">${esc(x.notities)}</div>`:""}</div>
-  ${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">bron ↗</a>`:""}<button class="btn small primary" data-add="${i}">Toevoegen</button><button class="btn small" data-ign="${i}">Negeren</button></div>`).join("")}</div>`
-  :`<div class="empty">Geen nieuwe vondsten.${inbox.length?"":" (Nog geen scanbestand gevonden – dat verschijnt na de eerste wekelijkse scan, of open de app via GitHub Pages.)"}</div>`}`;
-  $("#reloadInbox").onclick = loadInbox;
-  $("#loadLocalInbox").onclick = ()=>pickFile(d=>{ inbox = Array.isArray(d)?d:(d.vondsten||[]); render(); });
-  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{
-    const x = nieuw[+b.dataset.add];
-    db.items.push(normalize({...x, status:"geinteresseerd"})); save(); toast("Toegevoegd"); render();
-  });
-  document.querySelectorAll("[data-ign]").forEach(b=>b.onclick=()=>{ db.genegeerd.push(keyOf(nieuw[+b.dataset.ign])); save(); render(); });
-}
-
-function bronnen(){
-  const b = db.settings.bronnen;
-  $("#main").innerHTML = `<p class="muted" style="margin-top:0">Plekken die de wekelijkse scan afloopt, en snelle links om zelf te zoeken. Max reistijd: <b>${db.settings.maxReistijd} min</b> enkele reis.</p>
-  <div class="list">${b.map((x,i)=>`<div class="item"><div class="grow"><b>${esc(x.naam)}</b>${x.notitie?`<div class="muted" style="font-size:12px">${esc(x.notitie)}</div>`:""}</div>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">open ↗</a>`:""}<button class="btn small" data-e="${i}">Wijzig</button><button class="btn small danger" data-d="${i}">×</button></div>`).join("")}</div>
-  <div class="toolbar" style="margin-top:12px"><button class="btn" id="addBron">+ Bron</button></div>`;
-  $("#addBron").onclick = ()=>{ const naam=prompt("Naam bron"); if(!naam) return; const url=prompt("URL (mag leeg)")||""; b.push({naam,url}); save(); bronnen(); };
-  document.querySelectorAll("[data-e]").forEach(x=>x.onclick=()=>{ const o=b[+x.dataset.e]; const naam=prompt("Naam",o.naam); if(naam===null) return; const url=prompt("URL",o.url||""); o.naam=naam; if(url!==null) o.url=url; save(); bronnen(); });
-  document.querySelectorAll("[data-d]").forEach(x=>x.onclick=()=>{ b.splice(+x.dataset.d,1); save(); bronnen(); });
-}
-
-function instellingen(){
-  const s = db.settings;
-  $("#main").innerHTML = `
-  <section><h2>Algemeen</h2><div class="grid" style="max-width:520px">
-    <label>Max reistijd enkele reis (min)<input id="maxR" type="number" min="0" step="5" value="${s.maxReistijd}"></label></div></section>
-  <section><h2>Documentversies</h2><p class="muted">Eén per regel. Gebruik dezelfde naam als je bestand (bijv. <code>cv-2026-11-forensisch</code>).</p>
-    <div class="grid" style="max-width:720px">
-      <label>Cv-versies<textarea id="cvs">${esc(s.cvVersies.join("\n"))}</textarea></label>
-      <label>Motivatiebrief-versies<textarea id="mots">${esc(s.motivatieVersies.join("\n"))}</textarea></label>
-    </div>
-    <div id="docUse" style="margin-top:10px"></div></section>
-  <section><h2>Data</h2><p class="muted">Je data staat alleen in deze browser. Exporteer regelmatig als back-up of om op een ander apparaat te importeren.</p>
-    <div class="toolbar"><button class="btn" id="exp">Exporteren (.json)</button><button class="btn" id="imp">Importeren (.json)</button><button class="btn" id="csv">Exporteren (.csv)</button><button class="btn danger" id="wipe">Alles wissen</button></div></section>`;
-  const use = {};
-  db.items.forEach(i=>{ [i.cv,i.motivatie].filter(Boolean).forEach(v=>use[v]=(use[v]||0)+1); });
-  $("#docUse").innerHTML = Object.keys(use).length ? `<span class="muted">Gebruik: </span>${Object.entries(use).map(([k,v])=>`<span class="pill">${esc(k)} × ${v}</span>`).join(" ")}` : "";
-  $("#maxR").onchange = e=>{ s.maxReistijd = Number(e.target.value)||0; save(); toast("Opgeslagen"); };
-  const lines = v => v.split("\n").map(x=>x.trim()).filter(Boolean);
-  $("#cvs").onchange = e=>{ s.cvVersies = lines(e.target.value); save(); toast("Opgeslagen"); };
-  $("#mots").onchange = e=>{ s.motivatieVersies = lines(e.target.value); save(); toast("Opgeslagen"); };
-  $("#exp").onclick = ()=>download(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), `stagetracker-backup-${today()}.json`);
-  $("#imp").onclick = ()=>pickFile(d=>{
-    if(!d || !Array.isArray(d.items)){ toast("Geen geldig back-upbestand"); return; }
-    if(!confirm(`${d.items.length} items importeren? Bestaande items met hetzelfde id worden overschreven.`)) return;
-    const map = new Map(db.items.map(i=>[i.id,i])); d.items.forEach(i=>map.set(i.id, normalize(i)));
-    db.items=[...map.values()]; if(d.settings) db.settings=Object.assign(db.settings,d.settings); if(d.genegeerd) db.genegeerd=[...new Set([...db.genegeerd,...d.genegeerd])];
-    save(); toast("Geïmporteerd"); render();
-  });
-  $("#csv").onclick = exportCsv;
-  $("#wipe").onclick = ()=>{ if(confirm("Alle data in deze browser wissen? Exporteer eerst een back-up.")){ db=blank(); save(); render(); } };
-}
-
-/* ---------- form ---------- */
-function normalize(x){
-  return {id:x.id||uid(), organisatie:x.organisatie||"", functie:x.functie||"", soort:x.soort||SOORTEN[0], sector:x.sector||"Forensisch",
-    locatie:x.locatie||"", reistijd:x.reistijd??"", deadline:x.deadline||"", start:x.start||"", link:x.link||"", contact:x.contact||"",
-    contactInfo:x.contactInfo||"", status:x.status||"geinteresseerd", followUp:x.followUp||"", cv:x.cv||"", motivatie:x.motivatie||"",
-    notities:x.notities||"", toegevoegd:x.toegevoegd||today(), historie:x.historie||[{datum:today(), status:x.status||"geinteresseerd"}]};
-}
-function opts(sel, list, val, withEmpty){
-  sel.innerHTML = (withEmpty?'<option value="">–</option>':"") + list.map(o=>{ const v=typeof o==="string"?o:o.id, l=typeof o==="string"?o:o.label; return `<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`; }).join("");
-  if(val && ![...sel.options].some(o=>o.value===val)) sel.insertAdjacentHTML("beforeend", `<option selected>${esc(val)}</option>`);
-}
-function openForm(id){
-  editingId = id || null;
-  const it = id ? db.items.find(i=>i.id===id) : normalize({});
-  const f = $("#form");
-  opts(f.soort, SOORTEN, it.soort); opts(f.sector, SECTOREN, it.sector); opts(f.status, STATUSES, it.status);
-  opts(f.cv, db.settings.cvVersies, it.cv, true); opts(f.motivatie, db.settings.motivatieVersies, it.motivatie, true);
-  ["organisatie","functie","locatie","reistijd","deadline","start","link","contact","contactInfo","followUp","notities"].forEach(k=>f[k].value = it[k] ?? "");
-  $("#dlgTitle").textContent = id ? it.organisatie : "Nieuwe plek";
-  $("#delBtn").style.display = id ? "" : "none";
-  $("#icsBtn").style.display = id ? "" : "none";
-  $("#histBox").innerHTML = id && it.historie?.length ? `<ul class="hist">${it.historie.map(h=>`<li>${fmtDate(h.datum)} – ${statusLabel(h.status)}</li>`).join("")}</ul>` : "";
-  $("#dlg").showModal();
-}
-$("#form").addEventListener("submit", e=>{
-  if(e.submitter && e.submitter.value!=="save") return;
-  const f = e.target, data = {};
-  ["organisatie","functie","soort","sector","locatie","reistijd","deadline","start","link","contact","contactInfo","status","followUp","cv","motivatie","notities"].forEach(k=>data[k]=f[k].value.trim());
-  if(data.reistijd!=="") data.reistijd = Number(data.reistijd);
-  if(editingId){
-    const it = db.items.find(i=>i.id===editingId); const newStatus = data.status; delete data.status;
-    Object.assign(it, data); setStatus(it.id, newStatus);
-  } else {
-    db.items.push(normalize(data));
+/* ===== render: list ===== */
+function dateCell(it){
+  if(isOpen(it) && it.actie.datum && it.status !== "nieuw" && it.status !== "geinteresseerd"){
+    const d = days(it.actie.datum); return `<span class="${d<0?"late":d<=3?"soon":""}" title="Volgende actie">${fmt(it.actie.datum)}</span>`;
   }
-  save(); render(); toast("Opgeslagen");
-});
-$("#delBtn").onclick = ()=>{ if(!confirm("Deze plek verwijderen?")) return; db.items = db.items.filter(i=>i.id!==editingId); save(); $("#dlg").close(); render(); };
-$("#icsBtn").onclick = ()=>{ const it=db.items.find(i=>i.id===editingId); const ev=events().filter(e=>e.it.id===it.id); if(!ev.length){toast("Geen deadline of follow-up ingevuld");return;} downloadIcs(ev, `${it.organisatie.replace(/\W+/g,"-")}.ics`); };
+  if(!it.deadline) return "–";
+  const d = days(it.deadline), cls = isOpen(it) && ["nieuw","geinteresseerd"].includes(it.status) ? (d<0?"late":d<=7?"soon":"") : "";
+  return `<span class="${cls}" title="Deadline">${fmt(it.deadline)}</span>`;
+}
+function renderList(){
+  const arr = visible();
+  const title = ui.smart ? (ui.smart==="telaat"?"Te laat":"Deze week") : FOLDERS.find(f=>f.id===ui.folder)?.label;
+  const n = ui.checked.size;
+  $("#mid").innerHTML = `
+    <div class="bar">
+      <input type="checkbox" id="chkAll" title="Alles selecteren" ${n && n===arr.length ? "checked":""} style="margin:0 8px 0 2px">
+      ${n ? `<span class="title">${n} geselecteerd</span>
+        <button class="btn sm" data-bulk="gelezen"><i class="ti ti-mail-opened"></i>Gelezen</button>
+        <select id="bulkSt"><option value="">Status…</option>${Object.keys(ST).map(s=>`<option value="${s}">${ST[s].label}</option>`).join("")}</select>
+        <select id="bulkLbl"><option value="">Label…</option>${LABELS.map(l=>`<option value="${esc(l.id)}">${esc(l.kort)}</option>`).join("")}</select>
+        <button class="btn sm" data-bulk="negeren"><i class="ti ti-archive"></i>Negeren</button>`
+      : `<span class="title">${esc(title)}</span>${ui.label ? lblHtml(ui.label) : ""}<span class="sub" style="margin-left:6px">${arr.length}</span>`}
+      <span class="sp"></span>
+      <select id="sort" title="Sorteren"><option value="deadline">Deadline</option><option value="actie">Volgende actie</option><option value="org">Organisatie</option><option value="reistijd">Reistijd</option><option value="toegevoegd">Nieuwste eerst</option></select>
+    </div>
+    <div class="list" id="list">
+      ${arr.length ? arr.map(it => `
+        <div class="row ${ui.sel===it.id?"sel":""} ${it.gelezen?"":"unread"}" data-id="${it.id}" draggable="true">
+          <input type="checkbox" data-chk="${it.id}" ${ui.checked.has(it.id)?"checked":""}>
+          <div class="org">${esc(it.organisatie)||"<span class='sub'>Naamloos</span>"}</div>
+          <div class="fn"><span class="orgm">${esc(it.organisatie)} · </span>${esc(it.functie)} ${lblHtml(it.soort)} <span class="sub">${it.locatie?"· "+esc(it.locatie):""}${it.reistijd!==""&&it.reistijd!=null?` · <span class="${Number(it.reistijd)>db.settings.maxReistijd?"late":""}">${it.reistijd} min</span>`:""}${it.actie.tekst && isOpen(it)?" · "+esc(it.actie.tekst):""}</span></div>
+          <div class="stc">${ui.folder==="alles"||ui.smart||ui.folder==="resultaat"?stHtml(it.status):""}</div>
+          <div class="date">${dateCell(it)}</div>
+        </div>`).join("")
+      : emptyState()}
+      ${arr.length ? `<div class="hint"><kbd>J</kbd> <kbd>K</kbd> volgende/vorige · <kbd>X</kbd> selecteren · <kbd>E</kbd> negeren · <kbd>1</kbd>–<kbd>5</kbd> status · <kbd>/</kbd> zoeken · <kbd>?</kbd> alle sneltoetsen</div>` : ""}
+    </div>`;
+  $("#sort").value = ui.sort;
+  $("#sort").onchange = e => { ui.sort = e.target.value; saveUi(); renderList(); };
+  $("#chkAll").onchange = e => { ui.checked = e.target.checked ? new Set(arr.map(i=>i.id)) : new Set(); renderList(); };
+  $("#list").querySelectorAll(".row").forEach(r => {
+    r.onclick = e => { if(e.target.matches("input")) return; select(r.dataset.id); };
+    r.ondragstart = e => e.dataTransfer.setData("text/plain", r.dataset.id);
+  });
+  $("#list").querySelectorAll("[data-chk]").forEach(c => c.onchange = () => { c.checked ? ui.checked.add(c.dataset.chk) : ui.checked.delete(c.dataset.chk); renderList(); });
+  $("#mid").querySelectorAll("[data-bulk]").forEach(b => b.onclick = () => bulk(b.dataset.bulk));
+  const bs = $("#bulkSt"); if(bs) bs.onchange = () => bulk("status", bs.value);
+  const bl = $("#bulkLbl"); if(bl) bl.onchange = () => bulk("label", bl.value);
+}
+function emptyState(){
+  if(ui.q || ui.label || ui.smart) return `<div class="empty"><i class="ti ti-filter-off"></i>Niets gevonden met deze filters.</div>`;
+  if(ui.folder === "nieuw") return `<div class="empty"><i class="ti ti-inbox"></i>Geen nieuwe vondsten.<br><span class="sub">De wekelijkse scan zet hier nieuwe plekken neer.</span></div>`;
+  return `<div class="empty"><i class="ti ti-briefcase"></i>Nog niets in deze map.<br><br><button class="btn" onclick="document.getElementById('newBtn').click()"><i class="ti ti-plus"></i>Plek toevoegen</button></div>`;
+}
+function bulk(kind, val){
+  const ids = [...ui.checked]; if(!ids.length) return;
+  ids.forEach(id => { const it = get(id); if(!it) return;
+    if(kind==="gelezen") it.gelezen = true;
+    if(kind==="negeren") setStatus(it, "genegeerd");
+    if(kind==="status" && val) setStatus(it, val);
+    if(kind==="label" && val){ it.soort = val; log(it, `Label: ${labelOf(val).kort}`); }
+  });
+  ui.checked.clear(); save(); toast(`${ids.length} bijgewerkt`); render();
+}
 
-/* ---------- export helpers ---------- */
-function download(blob, name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
-function pickFile(cb){ const inp=$("#importFile"); inp.value=""; inp.onchange=()=>{ const file=inp.files[0]; if(!file) return; file.text().then(t=>{ try{cb(JSON.parse(t));}catch(e){toast("Bestand is geen geldige JSON");} }); }; inp.click(); }
-function icsEsc(s){ return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/[,;]/g, m=>"\\"+m); }
+/* ===== render: board ===== */
+function cardHtml(it){
+  const d = actieDue(it), l = labelOf(it.soort);
+  return `<div class="card ${ui.sel===it.id?"sel":""}" draggable="true" data-id="${it.id}">
+    <div class="t"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.organisatie)||"Naamloos"}</span><span class="dot" title="${esc(l.kort)}" style="background:${l.c};margin-top:5px"></span></div>
+    <div class="s">${esc(it.functie)}</div>
+    ${it.actie.tekst || it.contact ? `<div class="a">${it.contact?`<span class="av" title="${esc(it.contact)}">${esc(initials(it.contact))}</span>`:""}${it.actie.tekst?`<span class="${d!=null&&d<0?"late":d!=null&&d<=3?"soon":""}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="ti ti-${d!=null&&d<0?"alert-circle":"arrow-right"}"></i> ${esc(it.actie.tekst)}${it.actie.datum?" · "+fmt(it.actie.datum):""}</span>`:""}</div>`
+    : it.deadline ? `<div class="a"><i class="ti ti-calendar"></i> deadline ${fmt(it.deadline)}</div>` : ""}
+  </div>`;
+}
+function renderBoard(){
+  const base = baseFilter().filter(it => !ui.smart || smartMatch(it, ui.smart));
+  const by = s => base.filter(i => i.status === s).sort((a,b) => (a.actie.datum||a.deadline||"9999") > (b.actie.datum||b.deadline||"9999") ? 1 : -1);
+  const col = (s, title) => { const its = by(s); return `<div class="col" data-st="${s}"><div class="colh">${title}<span>${its.length}</span></div>${its.map(cardHtml).join("")}</div>`; };
+  const acc = by("aangenomen"), rej = by("afgewezen");
+  const nNew = base.filter(i => i.status === "nieuw").length;
+  $("#mid").innerHTML = `
+    <div class="bar"><span class="title">Pijplijn</span>${ui.label ? lblHtml(ui.label) : ""}<span class="sub">${nNew ? `${nNew} nieuwe vondst${nNew>1?"en":""} in <a href="#" id="toNew">Nieuw</a>` : ""}</span><span class="sp"></span><span class="sub">Sleep kaarten tussen kolommen</span></div>
+    <div class="board">
+      ${col("geinteresseerd","Interesse")}${col("gesolliciteerd","Verstuurd")}${col("gesprek","Gesprek")}
+      <div class="col"><div class="colh">Resultaat<span>${acc.length+rej.length}</span></div>
+        <div class="zone" data-st="aangenomen"><h5>Aangenomen</h5>${acc.map(cardHtml).join("")}</div>
+        <div class="zone" data-st="afgewezen"><h5>Afgewezen</h5>${rej.map(cardHtml).join("")}</div>
+      </div>
+    </div>`;
+  const tn = $("#toNew"); if(tn) tn.onclick = e => { e.preventDefault(); ui.view = "list"; ui.folder = "nieuw"; ui.smart = null; saveUi(); render(); };
+  $("#mid").querySelectorAll(".card").forEach(c => { c.onclick = () => select(c.dataset.id); c.ondragstart = e => e.dataTransfer.setData("text/plain", c.dataset.id); });
+  $("#mid").querySelectorAll("[data-st]").forEach(z => dropTarget(z, id => { setStatus(get(id), z.dataset.st); save(); render(); }));
+}
+function dropTarget(el, fn){
+  el.ondragover = e => { e.preventDefault(); e.stopPropagation(); el.classList.add("drop"); };
+  el.ondragleave = () => el.classList.remove("drop");
+  el.ondrop = e => { e.preventDefault(); e.stopPropagation(); el.classList.remove("drop"); const id = e.dataTransfer.getData("text/plain"); if(get(id)) fn(id); };
+}
+
+/* ===== render: detail ===== */
+function opt(list, val, empty){
+  let h = empty ? `<option value="">–</option>` : "";
+  h += list.map(o => { const v = typeof o === "string" ? o : o.v, l = typeof o === "string" ? o : o.l; return `<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`; }).join("");
+  if(val && !list.some(o => (typeof o === "string" ? o : o.v) === val)) h += `<option selected>${esc(val)}</option>`;
+  return h;
+}
+function renderDetail(){
+  const it = get(ui.sel), el = $("#detail");
+  if(!it){ el.innerHTML = `<div class="empty" style="padding-top:120px"><i class="ti ti-mail-opened"></i>Selecteer een plek om de details te zien.</div>`; return; }
+  const dl = days(it.deadline), ad = actieDue(it), far = it.reistijd !== "" && it.reistijd != null && Number(it.reistijd) > db.settings.maxReistijd;
+  el.innerHTML = `
+    <div class="dhead">
+      <button class="btn sm back" id="back"><i class="ti ti-arrow-left"></i>Terug</button>
+      <input class="big" data-k="functie" value="${esc(it.functie)}" placeholder="Functie of stage">
+      <input class="med" data-k="organisatie" value="${esc(it.organisatie)}" placeholder="Organisatie">
+      <div class="chips">
+        ${stHtml(it.status)} ${lblHtml(it.soort)}
+        ${isOpen(it) && it.deadline && ["nieuw","geinteresseerd"].includes(it.status) ? (dl<0 ? `<span class="chip c-bad">Deadline verlopen</span>` : dl<=7 ? `<span class="chip c-warn">Deadline over ${dl} dag${dl===1?"":"en"}</span>` : "") : ""}
+        ${far ? `<span class="chip c-bad">${it.reistijd} min &gt; max ${db.settings.maxReistijd}</span>` : ""}
+        ${it.bron==="scan" ? `<span class="chip" style="background:var(--accent-soft);color:var(--accent-text)">Via scan</span>` : ""}
+      </div>
+    </div>
+    ${it.status === "nieuw" ? `<div class="dsec" style="display:flex;gap:6px;flex-wrap:wrap;background:var(--accent-soft)"><span style="flex:1;min-width:160px">Nieuwe vondst. Interessant?</span><button class="btn sm primary" data-set="geinteresseerd"><i class="ti ti-star"></i>Interesse</button><button class="btn sm" data-set="genegeerd"><i class="ti ti-archive"></i>Negeren</button></div>` : ""}
+    ${isOpen(it) && it.status !== "nieuw" ? `<div class="dsec"><h5>Volgende actie</h5>
+      <div class="action ${ad!=null&&ad<0?"late":""}">
+        <div class="inrow"><input class="f" data-k="actie.tekst" value="${esc(it.actie.tekst)}" placeholder="Bijv. motivatiebrief schrijven, nabellen…" style="flex:1"><input class="f" type="date" data-k="actie.datum" value="${esc(it.actie.datum)}" style="width:140px"></div>
+        ${it.actie.tekst ? `<div class="inrow" style="margin-top:6px"><button class="btn sm" id="done"><i class="ti ti-check"></i>Gedaan</button><button class="btn sm" id="snooze"><i class="ti ti-clock-plus"></i>+3 dagen</button>${ad!=null?`<span class="sub ${ad<0?"late":""}" style="margin-left:auto;font-size:12px">${ad<0?`${-ad} dag${ad===-1?"":"en"} te laat`:ad===0?"vandaag":`over ${ad} dag${ad===1?"":"en"}`}</span>`:""}</div>` : ""}
+      </div></div>` : ""}
+    <div class="dsec"><h5>Contact</h5>
+      <div class="inrow" style="align-items:flex-start"><span class="av lg">${esc(initials(it.contact))}</span>
+        <div style="flex:1;display:grid;gap:2px"><input class="f" data-k="contact" value="${esc(it.contact)}" placeholder="Naam contactpersoon"><input class="f" data-k="contactFunctie" value="${esc(it.contactFunctie)}" placeholder="Functie"><input class="f" data-k="contactInfo" value="${esc(it.contactInfo)}" placeholder="E-mail of telefoon"></div></div>
+    </div>
+    <div class="dsec"><h5>Gegevens</h5>
+      <div class="fields">
+        <label>Status</label><select class="f" data-k="status">${opt(Object.keys(ST).map(s=>({v:s,l:ST[s].label})), it.status)}</select>
+        <label>Label</label><select class="f" data-k="soort">${opt(LABELS.map(l=>({v:l.id,l:l.kort})), it.soort)}</select>
+        <label>Sector</label><select class="f" data-k="sector">${opt(SECTOREN, it.sector)}</select>
+        <label>Locatie</label><input class="f" data-k="locatie" value="${esc(it.locatie)}" placeholder="Plaats">
+        <label>Reistijd (min)</label><input class="f" type="number" min="0" step="5" data-k="reistijd" value="${esc(it.reistijd)}" placeholder="Enkele reis">
+        <label>Deadline</label><input class="f" type="date" data-k="deadline" value="${esc(it.deadline)}">
+        <label>Start</label><input class="f" type="date" data-k="start" value="${esc(it.start)}">
+        <label>Link</label><div class="inrow"><input class="f" type="url" data-k="link" value="${esc(it.link)}" placeholder="https://">${it.link?`<a class="icon-btn" href="${esc(it.link)}" target="_blank" rel="noopener" title="Openen"><i class="ti ti-external-link"></i></a>`:""}</div>
+        <label>Cv</label><select class="f" data-k="cv">${opt(db.settings.cvVersies, it.cv, true)}</select>
+        <label>Motivatiebrief</label><select class="f" data-k="motivatie">${opt(db.settings.motivatieVersies, it.motivatie, true)}</select>
+      </div></div>
+    <div class="dsec"><h5>Notities</h5><textarea class="f" data-k="notities" placeholder="Wat valt op, wie ken je daar, wat vragen ze…">${esc(it.notities)}</textarea></div>
+    <div class="dsec"><h5>Tijdlijn</h5><ul class="tl">${it.historie.map(h=>`<li><b>${fmt(h.datum)}</b>${esc(h.tekst)}</li>`).join("") || `<li>Nog geen activiteit</li>`}</ul></div>
+    <div class="dfoot"><button class="btn sm" id="itemIcs"><i class="ti ti-calendar-plus"></i>Naar agenda</button><span style="flex:1"></span><button class="btn sm" id="del" style="color:var(--danger)"><i class="ti ti-trash"></i>Verwijderen</button></div>`;
+  el.querySelectorAll("[data-k]").forEach(inp => inp.onchange = () => {
+    const k = inp.dataset.k; let v = inp.value.trim();
+    if(k === "status"){ setStatus(it, v); save(); render(); return; }
+    if(k === "reistijd") v = v === "" ? "" : Number(v);
+    if(k.startsWith("actie.")) it.actie[k.slice(6)] = v; else it[k] = v;
+    if(k === "soort") log(it, `Label: ${labelOf(v).kort}`);
+    save(); renderSide(); ui.view === "board" ? renderBoard() : renderList();
+    if(["soort","reistijd","deadline","contact","actie.tekst","actie.datum","organisatie"].includes(k)) renderDetail();
+  });
+  el.querySelectorAll("[data-set]").forEach(b => b.onclick = () => { setStatus(it, b.dataset.set); save(); if(b.dataset.set==="genegeerd") moveSel(1, true); render(); });
+  const done = $("#done"); if(done) done.onclick = () => { log(it, `Gedaan: ${it.actie.tekst}`); it.actie = {tekst:"", datum:""}; save(); render(); toast("Gedaan – wat is de volgende stap?"); setTimeout(()=>{ const f = el.querySelector('[data-k="actie.tekst"]'); f && f.focus(); }, 30); };
+  const sn = $("#snooze"); if(sn) sn.onclick = () => { it.actie.datum = addDays(it.actie.datum && days(it.actie.datum) > 0 ? it.actie.datum : today(), 3); save(); render(); };
+  $("#del").onclick = () => confirmDlg(`“${it.functie || it.organisatie || "Deze plek"}” verwijderen?`, "Verwijderen", () => { db.items = db.items.filter(i => i.id !== it.id); ui.sel = null; save(); render(); });
+  $("#itemIcs").onclick = () => { const ev = events().filter(e => e.it.id === it.id); ev.length ? downloadIcs(ev, `${(it.organisatie||"plek").replace(/\W+/g,"-")}.ics`) : toast("Vul een deadline of volgende actie met datum in"); };
+  $("#back").onclick = () => { $("#app").classList.remove("show-detail"); };
+}
+
+/* ===== selection & render ===== */
+function select(id){
+  ui.sel = id; const it = get(id);
+  if(it && !it.gelezen){ it.gelezen = true; save(); }
+  $("#app").classList.add("show-detail");
+  render(true);
+}
+function moveSel(dir, keepIdx){
+  const arr = ui.view === "board" ? [...$("#mid").querySelectorAll(".card")].map(c=>c.dataset.id) : visible().map(i=>i.id);
+  if(!arr.length){ ui.sel = null; return; }
+  let i = arr.indexOf(ui.sel);
+  if(keepIdx){ const next = arr[i+1] || arr[i-1]; ui.sel = next || null; return; }
+  i = i < 0 ? 0 : Math.max(0, Math.min(arr.length-1, i+dir));
+  select(arr[i]);
+}
+function render(keepScroll){
+  const list = $("#list"), st = list ? list.scrollTop : 0;
+  $("#vList").classList.toggle("on", ui.view==="list"); $("#vBoard").classList.toggle("on", ui.view==="board");
+  renderSide(); ui.view === "board" ? renderBoard() : renderList(); renderDetail();
+  const nl = $("#list"); if(nl && keepScroll) nl.scrollTop = st;
+  document.title = (()=>{ const n = db.items.filter(i=>i.status==="nieuw"&&!i.gelezen).length; return n ? `(${n}) Stagetracker` : "Stagetracker"; })();
+}
+
+/* ===== new item ===== */
+function newItem(){
+  const it = migrate({status:"geinteresseerd", gelezen:true, soort: ui.label || "Stage jaar 3"});
+  log(it, "Handmatig toegevoegd");
+  db.items.push(it); save();
+  ui.q = ""; $("#q").value = "";
+  if(ui.view === "list"){ ui.folder = "interesse"; ui.smart = null; }
+  select(it.id);
+  setTimeout(() => { const f = $('#detail [data-k="functie"]'); f && f.focus(); }, 30);
+}
+
+/* ===== inbox from weekly scan ===== */
+const keyOf = x => `${(x.organisatie||"").toLowerCase().trim()}|${(x.functie||"").toLowerCase().trim()}`;
+function known(x){ const k = keyOf(x); return db.genegeerd.includes(k) || db.items.some(i => keyOf(i) === k || (x.link && i.link === x.link)); }
+function ingest(list){
+  let n = 0;
+  (list||[]).forEach(x => { if(!x || !x.organisatie || known(x)) return;
+    const {id:_skip, ...rest} = x;
+    const it = migrate({...rest, status:"nieuw", gelezen:false, bron:"scan", toegevoegd:x.gevondenOp||today(), historie:[]});
+    it.historie = [{datum:x.gevondenOp||today(), tekst:"Gevonden door wekelijkse scan"}];
+    db.items.push(it); n++; });
+  if(n){ save(); toast(`${n} nieuwe vondst${n>1?"en":""}`); }
+  return n;
+}
+async function loadInbox(){
+  try{ const r = await fetch(INBOX_URL+"?t="+Date.now(), {cache:"no-store"}); if(r.ok){ const d = await r.json(); if(ingest(Array.isArray(d)?d:d.vondsten)) render(true); } }catch(e){}
+}
+
+/* ===== ics / export ===== */
+function events(){
+  const ev = [];
+  db.items.forEach(it => { if(!isOpen(it)) return;
+    if(it.deadline && ["nieuw","geinteresseerd"].includes(it.status)) ev.push({it, type:"Deadline", datum:it.deadline});
+    if(it.actie.tekst && it.actie.datum) ev.push({it, type:it.actie.tekst, datum:it.actie.datum});
+  });
+  return ev.sort((a,b) => a.datum > b.datum ? 1 : -1);
+}
+const icsEsc = s => String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/[,;]/g, m=>"\\"+m);
 function downloadIcs(ev, name){
   const stamp = new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
-  const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//stagetracker//NL","CALSCALE:GREGORIAN"];
-  ev.forEach(e=>{
-    const d = e.datum.replace(/-/g,""); const nd = new Date(e.datum+"T00:00"); nd.setDate(nd.getDate()+1);
-    const d2 = `${nd.getFullYear()}${String(nd.getMonth()+1).padStart(2,"0")}${String(nd.getDate()).padStart(2,"0")}`;
-    lines.push("BEGIN:VEVENT", `UID:${e.it.id}-${e.type.replace(/\W/g,"")}@stagetracker`, `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${d2}`, "TRANSP:TRANSPARENT",
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//stagetracker//NL","CALSCALE:GREGORIAN"];
+  ev.forEach(e => {
+    L.push("BEGIN:VEVENT", `UID:${e.it.id}-${e.datum}-${e.type.replace(/\W/g,"").slice(0,20)}@stagetracker`, `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${e.datum.replace(/-/g,"")}`, `DTEND;VALUE=DATE:${addDays(e.datum,1).replace(/-/g,"")}`, "TRANSP:TRANSPARENT",
       `SUMMARY:${icsEsc(`${e.type}: ${e.it.organisatie} – ${e.it.functie}`)}`,
-      `DESCRIPTION:${icsEsc(`${e.it.soort}\nStatus: ${statusLabel(e.it.status)}\n${e.it.link||""}`)}`,
-      ...(e.it.link?[`URL:${e.it.link}`]:[]),
+      `DESCRIPTION:${icsEsc(`${labelOf(e.it.soort).kort} · ${ST[e.it.status].label}\n${e.it.link||""}`)}`,
+      ...(e.it.link ? [`URL:${e.it.link}`] : []),
       "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Herinnering","TRIGGER:-P3D","END:VALARM",
-      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Herinnering","TRIGGER:-P1D","END:VALARM",
-      "END:VEVENT");
+      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Herinnering","TRIGGER:-P1D","END:VALARM","END:VEVENT");
   });
-  lines.push("END:VCALENDAR");
-  download(new Blob([lines.join("\r\n")],{type:"text/calendar"}), name);
+  L.push("END:VCALENDAR");
+  download(new Blob([L.join("\r\n")], {type:"text/calendar"}), name);
 }
+function download(blob, name){ const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function pickFile(cb){ const f = $("#file"); f.value = ""; f.onchange = () => { const x = f.files[0]; if(x) x.text().then(t => { try{ cb(JSON.parse(t)); }catch(e){ toast("Geen geldige JSON"); } }); }; f.click(); }
 function exportCsv(){
-  const keys = ["organisatie","functie","soort","sector","locatie","reistijd","deadline","start","link","contact","contactInfo","status","followUp","cv","motivatie","notities","toegevoegd"];
+  const k = ["organisatie","functie","soort","sector","locatie","reistijd","deadline","start","link","contact","contactFunctie","contactInfo","status","cv","motivatie","notities","toegevoegd"];
   const q = v => `"${String(v??"").replace(/"/g,'""')}"`;
-  const csv = [keys.join(";"), ...db.items.map(i=>keys.map(k=>q(k==="status"?statusLabel(i[k]):i[k])).join(";"))].join("\n");
-  download(new Blob(["\ufeff"+csv],{type:"text/csv"}), `stagetracker-${today()}.csv`);
+  const rows = db.items.map(i => [...k.map(x => q(x==="status"?ST[i.status].label:i[x])), q(i.actie.tekst), q(i.actie.datum)].join(";"));
+  download(new Blob(["\ufeff"+[[...k,"volgendeActie","actieDatum"].join(";"), ...rows].join("\n")], {type:"text/csv"}), `stagetracker-${today()}.csv`);
 }
 
-/* ---------- init ---------- */
-document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{ view=b.dataset.view; render(); });
-$("#addBtn").onclick = ()=>openForm(null);
+/* ===== dialogs ===== */
+function openDlg(html, setup){ const d = $("#dlg"); d.innerHTML = html; d.showModal(); d.querySelectorAll("[data-close]").forEach(b => b.onclick = () => d.close()); setup && setup(d); }
+function confirmDlg(msg, okLabel, fn){
+  openDlg(`<div class="dlgh"><h2>${esc(msg)}</h2></div><div class="dlgb" style="display:flex;gap:8px;justify-content:flex-end;padding-top:16px"><button class="btn" data-close>Annuleren</button><button class="btn primary" id="ok">${esc(okLabel)}</button></div>`,
+    d => d.querySelector("#ok").onclick = () => { d.close(); fn(); });
+}
+function settingsDlg(){
+  const s = db.settings;
+  const bronRows = () => s.bronnen.map((b,i) => `<div class="bron"><input class="in" data-bn="${i}" value="${esc(b.naam)}" placeholder="Naam"><input class="in" data-bu="${i}" value="${esc(b.url)}" placeholder="https://"><div class="inrow">${b.url?`<a class="icon-btn" href="${esc(b.url)}" target="_blank" rel="noopener"><i class="ti ti-external-link"></i></a>`:""}<button class="icon-btn" data-bd="${i}" title="Verwijderen"><i class="ti ti-x"></i></button></div></div>`).join("");
+  openDlg(`<div class="dlgh"><h2>Instellingen</h2><button class="icon-btn" data-close><i class="ti ti-x"></i></button></div>
+    <div class="dlgb">
+      <h3>Reistijd</h3><div class="g2"><label>Max reistijd enkele reis (min)<input class="in" type="number" id="maxR" min="0" step="5" value="${s.maxReistijd}"></label></div>
+      <h3>Documentversies</h3><div class="g2"><label>Cv-versies (één per regel)<textarea class="in" id="cvs">${esc(s.cvVersies.join("\n"))}</textarea></label><label>Motivatiebrieven (één per regel)<textarea class="in" id="mots">${esc(s.motivatieVersies.join("\n"))}</textarea></label></div>
+      <h3>Bronnen</h3><div id="bronnen">${bronRows()}</div><button class="btn sm" id="addBron"><i class="ti ti-plus"></i>Bron</button>
+      <h3>Data</h3><p class="sub" style="margin:0 0 8px">Je data staat alleen in deze browser. Exporteer als back-up of om op een ander apparaat te importeren.</p>
+      <div class="inrow" style="flex-wrap:wrap"><button class="btn sm" id="exp"><i class="ti ti-download"></i>Export JSON</button><button class="btn sm" id="imp"><i class="ti ti-upload"></i>Import JSON</button><button class="btn sm" id="csv"><i class="ti ti-table-export"></i>Export CSV</button><button class="btn sm" id="scanFile"><i class="ti ti-file-import"></i>Scanbestand laden</button><button class="btn sm" id="wipe" style="color:var(--danger)"><i class="ti ti-trash"></i>Alles wissen</button></div>
+      <h3>Sneltoetsen</h3>${keysHtml()}
+    </div>`, d => {
+    const lines = v => v.split("\n").map(x=>x.trim()).filter(Boolean);
+    d.querySelector("#maxR").onchange = e => { s.maxReistijd = Number(e.target.value)||0; save(); render(true); };
+    d.querySelector("#cvs").onchange = e => { s.cvVersies = lines(e.target.value); save(); render(true); };
+    d.querySelector("#mots").onchange = e => { s.motivatieVersies = lines(e.target.value); save(); render(true); };
+    const bind = () => {
+      d.querySelectorAll("[data-bn]").forEach(x => x.onchange = () => { s.bronnen[+x.dataset.bn].naam = x.value; save(); });
+      d.querySelectorAll("[data-bu]").forEach(x => x.onchange = () => { s.bronnen[+x.dataset.bu].url = x.value.trim(); save(); });
+      d.querySelectorAll("[data-bd]").forEach(x => x.onclick = () => { s.bronnen.splice(+x.dataset.bd,1); save(); d.querySelector("#bronnen").innerHTML = bronRows(); bind(); });
+    }; bind();
+    d.querySelector("#addBron").onclick = () => { s.bronnen.push({naam:"",url:""}); save(); d.querySelector("#bronnen").innerHTML = bronRows(); bind(); };
+    d.querySelector("#exp").onclick = () => download(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), `stagetracker-backup-${today()}.json`);
+    d.querySelector("#imp").onclick = () => pickFile(x => {
+      if(!x || !Array.isArray(x.items)){ toast("Geen geldig back-upbestand"); return; }
+      const m = new Map(db.items.map(i=>[i.id,i])); x.items.forEach(i => m.set(i.id, migrate(i)));
+      db.items = [...m.values()]; if(x.settings) Object.assign(db.settings, x.settings); if(x.genegeerd) db.genegeerd = [...new Set([...db.genegeerd, ...x.genegeerd])];
+      save(); d.close(); render(); toast(`${x.items.length} items geïmporteerd`);
+    });
+    d.querySelector("#csv").onclick = exportCsv;
+    d.querySelector("#scanFile").onclick = () => pickFile(x => { const n = ingest(Array.isArray(x)?x:x.vondsten); d.close(); render(); if(!n) toast("Geen nieuwe vondsten in dit bestand"); });
+    d.querySelector("#wipe").onclick = () => confirmDlg("Alle data in deze browser wissen?", "Wissen", () => { db = blank(); ui.sel = null; save(); render(); });
+  });
+}
+function keysHtml(){
+  const K = [[["J","K"],"Volgende / vorige plek"],[["X"],"Selecteren"],[["E"],"Negeren"],[["1","2","3","4","5"],"Interesse, Verstuurd, Gesprek, Aangenomen, Afgewezen"],[["U"],"Markeer als ongelezen"],[["N"],"Nieuwe plek"],[["V"],"Lijst / pijplijn"],[["/"],"Zoeken"],[["Esc"],"Zoeken wissen / terug"],[["?"],"Sneltoetsen"]];
+  return `<div class="keys">${K.map(([ks,v])=>`<span>${ks.map(x=>`<kbd>${x}</kbd>`).join(" ")}</span><span>${v}</span>`).join("")}</div>
+    <p class="sub" style="margin-top:10px">Zoekfilters: <code>label:afstuderen</code> <code>status:gesprek</code> <code>plaats:breda</code> <code>sector:forensisch</code> <code>deadline:&lt;30d</code> <code>reistijd:&lt;60</code></p>`;
+}
+
+/* ===== events ===== */
+$("#q").oninput = e => { ui.q = e.target.value; $("#qClear").hidden = !ui.q; ui.checked.clear(); renderSide(); ui.view==="board" ? renderBoard() : renderList(); };
+$("#qClear").onclick = e => { e.preventDefault(); $("#q").value = ""; ui.q = ""; $("#qClear").hidden = true; render(); };
+$("#vList").onclick = () => { ui.view = "list"; saveUi(); render(); };
+$("#vBoard").onclick = () => { ui.view = "board"; saveUi(); render(); };
+$("#newBtn").onclick = newItem;
+$("#setBtn").onclick = settingsDlg;
+$("#icsBtn").onclick = () => { const ev = events(); ev.length ? (downloadIcs(ev, "stagetracker-herinneringen.ics"), toast(`${ev.length} items – importeer in Google Agenda`)) : toast("Geen deadlines of acties met datum"); };
+document.addEventListener("keydown", e => {
+  if($("#dlg").open) return;
+  const t = e.target;
+  if(t.matches("input,textarea,select")){ if(e.key === "Escape"){ t.blur(); if(t.id === "q"){ t.value=""; ui.q=""; render(); } } return; }
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  const it = get(ui.sel), k = e.key.toLowerCase();
+  const map = {"1":"geinteresseerd","2":"gesolliciteerd","3":"gesprek","4":"aangenomen","5":"afgewezen"};
+  if(k === "j" || e.key === "ArrowDown"){ e.preventDefault(); moveSel(1); }
+  else if(k === "k" || e.key === "ArrowUp"){ e.preventDefault(); moveSel(-1); }
+  else if(k === "/"){ e.preventDefault(); $("#q").focus(); }
+  else if(k === "n"){ e.preventDefault(); newItem(); }
+  else if(k === "v"){ ui.view = ui.view === "list" ? "board" : "list"; saveUi(); render(); }
+  else if(k === "?"){ openDlg(`<div class="dlgh"><h2>Sneltoetsen</h2><button class="icon-btn" data-close><i class="ti ti-x"></i></button></div><div class="dlgb" style="padding-top:14px">${keysHtml()}</div>`); }
+  else if(k === "escape"){ $("#app").classList.remove("show-detail"); }
+  else if(!it) return;
+  else if(k === "x"){ ui.checked.has(it.id) ? ui.checked.delete(it.id) : ui.checked.add(it.id); renderList(); }
+  else if(k === "e"){ setStatus(it, "genegeerd"); save(); moveSel(1, true); render(true); toast("Genegeerd"); }
+  else if(k === "u"){ it.gelezen = false; save(); render(true); }
+  else if(map[k]){ setStatus(it, map[k]); save(); render(true); toast(ST[map[k]].label); }
+});
+
 render();
 loadInbox();
+}
 </script>
 </body>
 </html>
