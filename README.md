@@ -7,6 +7,7 @@ Indeling als een mailprogramma: mappen links, lijst in het midden, leesvenster r
 
 - **Mappen per status**: Nieuw (scanvondsten, vet = ongelezen), Interesse, Verstuurd, Gesprek, Resultaat, Genegeerd, Alles. Sleep een plek op een map om de status te wijzigen.
 - **Labels** per soort: Stage jaar 3, Afstudeerstage, Bijbaan, Vacature, Open sollicitatie.
+- **Zoeken op het web** (`Z`): kies soort, richting, plaats en trefwoorden en open direct gerichte zoekopdrachten op Google Jobs, Indeed, LinkedIn, Werken voor Nederland, NFI, Magnet.me, Nationale Vacaturebank, AcademicTransfer en ziekenhuizen in de regio. Gevonden plek? Plak de link en voeg hem toe aan *Nieuw*. Eigen bronnen (Instellingen) verschijnen hier ook; `{q}` in de URL wordt de zoekopdracht.
 - **Lijst of pijplijn**: compacte lijst (triage) of kolommen Interesse → Verstuurd → Gesprek → Resultaat (slepen).
 - **Leesvenster**: alle gegevens direct bewerkbaar, contactpersoon, cv-/briefversie, notities en tijdlijn.
 - **Volgende actie** per plek met datum, *Gedaan* en *+3 dagen*. Smart-mappen *Te laat* en *Deze week*. Bij *Verstuurd* komt automatisch een follow-up over 10 dagen.

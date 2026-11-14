@@ -268,9 +268,9 @@ function setStatus(it, s){
 }
 
 /* ===== state ===== */
-const ui = {view:"list", folder:"nieuw", label:null, smart:null, q:"", sel:null, checked:new Set(), sort:"deadline"};
+const ui = {zoek:false, zoekForm:null, view:"list", folder:"nieuw", label:null, smart:null, q:"", sel:null, checked:new Set(), sort:"deadline"};
 try{ Object.assign(ui, JSON.parse(localStorage.getItem(STORE+".ui")||"{}"), {checked:new Set(), q:""}); }catch(e){}
-function saveUi(){ try{ localStorage.setItem(STORE+".ui", JSON.stringify({view:ui.view, folder:ui.folder, label:ui.label, smart:ui.smart, sort:ui.sort})); }catch(e){} }
+function saveUi(){ try{ localStorage.setItem(STORE+".ui", JSON.stringify({zoek:ui.zoek, zoekForm:ui.zoekForm, view:ui.view, folder:ui.folder, label:ui.label, smart:ui.smart, sort:ui.sort})); }catch(e){} }
 if(!db.items.some(i => i.status === "nieuw") && ui.folder === "nieuw" && db.items.length) ui.folder = "interesse";
 
 /* ===== filtering ===== */
@@ -323,20 +323,22 @@ function renderSide(){
   const late = base.filter(i => smartMatch(i,"telaat")).length, week = base.filter(i => smartMatch(i,"week")).length;
   const folders = ui.view === "board" ? FOLDERS.filter(f => ["nieuw","genegeerd","alles"].includes(f.id)) : FOLDERS;
   $("#side").innerHTML = `
+    <button class="nav ${ui.zoek?"on":""}" data-zoek="1" style="margin-bottom:4px"><i class="ti ti-world-search"></i>Zoeken op het web</button>
     <h4>Mappen</h4>
-    ${folders.map(f => `<button class="nav ${!ui.smart && ui.folder===f.id ? "on":""}" data-folder="${f.id}"><i class="ti ${f.icon}"></i>${f.label}<span class="n">${f.id==="nieuw" && unread ? `<b style="color:var(--accent-text)">${unread}</b>` : (cnt(f.st)||"")}</span></button>`).join("")}
+    ${folders.map(f => `<button class="nav ${!ui.zoek && !ui.smart && ui.folder===f.id ? "on":""}" data-folder="${f.id}"><i class="ti ${f.icon}"></i>${f.label}<span class="n">${f.id==="nieuw" && unread ? `<b style="color:var(--accent-text)">${unread}</b>` : (cnt(f.st)||"")}</span></button>`).join("")}
     <h4>Labels</h4>
     ${LABELS.map(l => `<button class="nav ${ui.label===l.id ? "on":""}" data-label="${esc(l.id)}"><span class="dot" style="background:${l.c}"></span>${esc(l.kort)}<span class="n">${db.items.filter(i=>i.soort===l.id && isOpen(i)).length || ""}</span></button>`).join("")}
     <h4>Volgende acties</h4>
-    <button class="nav ${ui.smart==="telaat"?"on":""}" data-smart="telaat"><i class="ti ti-alert-circle"></i>Te laat<span class="n ${late?"red":""}">${late||""}</span></button>
-    <button class="nav ${ui.smart==="week"?"on":""}" data-smart="week"><i class="ti ti-clock"></i>Deze week<span class="n">${week||""}</span></button>`;
+    <button class="nav ${!ui.zoek && ui.smart==="telaat"?"on":""}" data-smart="telaat"><i class="ti ti-alert-circle"></i>Te laat<span class="n ${late?"red":""}">${late||""}</span></button>
+    <button class="nav ${!ui.zoek && ui.smart==="week"?"on":""}" data-smart="week"><i class="ti ti-clock"></i>Deze week<span class="n">${week||""}</span></button>`;
   $("#side").querySelectorAll("[data-folder]").forEach(b => {
-    b.onclick = () => { ui.folder = b.dataset.folder; ui.smart = null; ui.checked.clear(); saveUi(); render(); };
+    b.onclick = () => { ui.folder = b.dataset.folder; ui.smart = null; ui.zoek = false; ui.checked.clear(); saveUi(); render(); };
     const st = DROP_STATUS[b.dataset.folder];
     if(st) dropTarget(b, id => { setStatus(get(id), st); save(); render(); });
   });
-  $("#side").querySelectorAll("[data-label]").forEach(b => b.onclick = () => { ui.label = ui.label === b.dataset.label ? null : b.dataset.label; saveUi(); render(); });
-  $("#side").querySelectorAll("[data-smart]").forEach(b => b.onclick = () => { ui.smart = ui.smart === b.dataset.smart ? null : b.dataset.smart; saveUi(); render(); });
+  $("#side").querySelector("[data-zoek]").onclick = () => { ui.zoek = true; ui.view = "list"; saveUi(); render(); };
+  $("#side").querySelectorAll("[data-label]").forEach(b => b.onclick = () => { ui.zoek = false; ui.label = ui.label === b.dataset.label ? null : b.dataset.label; saveUi(); render(); });
+  $("#side").querySelectorAll("[data-smart]").forEach(b => b.onclick = () => { ui.smart = ui.smart === b.dataset.smart && !ui.zoek ? null : b.dataset.smart; ui.zoek = false; saveUi(); render(); });
 }
 
 /* ===== render: list ===== */
@@ -494,7 +496,7 @@ function renderDetail(){
     if(k === "reistijd") v = v === "" ? "" : Number(v);
     if(k.startsWith("actie.")) it.actie[k.slice(6)] = v; else it[k] = v;
     if(k === "soort") log(it, `Label: ${labelOf(v).kort}`);
-    save(); renderSide(); ui.view === "board" ? renderBoard() : renderList();
+    save(); renderSide(); if(!ui.zoek) ui.view === "board" ? renderBoard() : renderList();
     if(["soort","reistijd","deadline","contact","actie.tekst","actie.datum","organisatie"].includes(k)) renderDetail();
   });
   el.querySelectorAll("[data-set]").forEach(b => b.onclick = () => { setStatus(it, b.dataset.set); save(); if(b.dataset.set==="genegeerd") moveSel(1, true); render(); });
@@ -523,9 +525,88 @@ function moveSel(dir, keepIdx){
 function render(keepScroll){
   const list = $("#list"), st = list ? list.scrollTop : 0;
   $("#vList").classList.toggle("on", ui.view==="list"); $("#vBoard").classList.toggle("on", ui.view==="board");
-  renderSide(); ui.view === "board" ? renderBoard() : renderList(); renderDetail();
+  renderSide(); ui.zoek ? renderSearch() : ui.view === "board" ? renderBoard() : renderList(); renderDetail();
   const nl = $("#list"); if(nl && keepScroll) nl.scrollTop = st;
   document.title = (()=>{ const n = db.items.filter(i=>i.status==="nieuw"&&!i.gelezen).length; return n ? `(${n}) Stagetracker` : "Stagetracker"; })();
+}
+
+/* ===== zoeken op het web ===== */
+const RICHTINGEN = [
+  {id:"forensisch", l:"Forensisch", q:"forensisch"},
+  {id:"dna", l:"DNA / moleculair", q:"DNA moleculair"},
+  {id:"tox", l:"Toxicologie", q:"toxicologie"},
+  {id:"micro", l:"Microbiologie", q:"microbiologie"},
+  {id:"kc", l:"Klinische chemie", q:"klinische chemie"},
+  {id:"patho", l:"Pathologie", q:"pathologie"},
+  {id:"genetica", l:"Klinische genetica", q:"genetica"}
+];
+const SOORT_Q = {"Stage jaar 3":"stage hbo laboratorium", "Afstudeerstage":"afstudeerstage hbo laboratorium", "Bijbaan":"bijbaan laboratorium student", "Vacature (na afstuderen)":"analist hbo laboratorium", "Open sollicitatie":"laboratorium hbo"};
+const ZOEK_BRONNEN = [
+  {naam:"Google Jobs", sub:"Bundelt vacatures van veel sites", icon:"ti-brand-google", url:(q,p)=>`https://www.google.com/search?ibp=htl;jobs&q=${enc(q+" "+p)}`},
+  {naam:"Indeed", sub:"Vacatures en stages", icon:"ti-briefcase", url:(q,p,r)=>`https://nl.indeed.com/jobs?q=${enc(q)}&l=${enc(p)}&radius=${r}`},
+  {naam:"LinkedIn", sub:"Vacatures en stages", icon:"ti-brand-linkedin", url:(q,p)=>`https://www.linkedin.com/jobs/search/?keywords=${enc(q)}&location=${enc(p+", Nederland")}`},
+  {naam:"Werken voor Nederland", sub:"Overheid: NFI, NVWA, RIVM, politie", icon:"ti-building-bank", url:q=>google(q, "site:werkenvoornederland.nl")},
+  {naam:"Nederlands Forensisch Instituut", sub:"Werken & stage bij het NFI", icon:"ti-fingerprint", url:q=>google(q.replace(/forensisch\s*/i,""), "NFI Nederlands Forensisch Instituut")},
+  {naam:"Magnet.me", sub:"Stages voor studenten", icon:"ti-school", url:q=>google(q, "site:magnet.me")},
+  {naam:"Nationale Vacaturebank", sub:"Brede vacaturebank", icon:"ti-list-search", url:q=>google(q, "site:nationalevacaturebank.nl")},
+  {naam:"AcademicTransfer", sub:"Universiteiten en UMC's", icon:"ti-microscope", url:q=>google(q, "site:academictransfer.com")},
+  {naam:"Ziekenhuizen in de regio", sub:"ETZ, Amphia, JBZ, Erasmus MC, Radboudumc", icon:"ti-building-hospital", url:q=>google(q, "(ETZ OR Amphia OR JBZ OR \"Erasmus MC\" OR Radboudumc OR \"Catharina Ziekenhuis\")")}
+];
+const enc = encodeURIComponent;
+const google = (q, extra) => `https://www.google.com/search?q=${enc(q+" "+extra)}`;
+function zoekForm(){
+  return ui.zoekForm || {soort:"Stage jaar 3", richting:["forensisch"], extra:"", plaats:"Tilburg", straal:"100"};
+}
+function zoekQuery(f){ return [SOORT_Q[f.soort]||"", ...RICHTINGEN.filter(r => f.richting.includes(r.id)).map(r => r.q), f.extra].join(" ").replace(/\s+/g," ").trim(); }
+function renderSearch(){
+  const f = zoekForm(), q = zoekQuery(f);
+  const std = new Set(DEFAULT_BRONNEN.map(b => b.url)), eigen = (db.settings.bronnen||[]).filter(b => b.url && !std.has(b.url));
+  $("#mid").innerHTML = `
+    <div class="bar"><span class="title">Zoeken op het web</span><span class="sub">Zoek direct, zonder op de wekelijkse scan te wachten</span></div>
+    <div class="list" style="padding:16px 18px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;max-width:760px">
+        <label class="sub" style="display:grid;gap:3px">Soort<select class="f" id="zSoort" style="border-color:var(--line)">${opt(LABELS.map(l=>({v:l.id,l:l.kort})), f.soort)}</select></label>
+        <label class="sub" style="display:grid;gap:3px">Plaats<input class="f" id="zPlaats" value="${esc(f.plaats)}" style="border-color:var(--line)"></label>
+        <label class="sub" style="display:grid;gap:3px">Straal (Indeed)<select class="f" id="zStraal" style="border-color:var(--line)">${opt([{v:"25",l:"25 km"},{v:"50",l:"50 km"},{v:"100",l:"100 km"}], f.straal)}</select></label>
+      </div>
+      <div class="sub" style="margin:12px 0 6px">Richting</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${RICHTINGEN.map(r => `<button class="btn sm" data-r="${r.id}" style="${f.richting.includes(r.id)?"background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent)":""}">${f.richting.includes(r.id)?'<i class="ti ti-check"></i>':""}${r.l}</button>`).join("")}</div>
+      <label class="sub" style="display:grid;gap:3px;margin-top:12px;max-width:760px">Extra trefwoorden<input class="f" id="zExtra" value="${esc(f.extra)}" placeholder="Bijv. PCR, HPLC, sequencing" style="border-color:var(--line)"></label>
+      <div style="margin:14px 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="sub">Zoekopdracht:</span><code style="background:var(--hover);padding:2px 8px;border-radius:6px">${esc(q)}</code></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-width:980px">
+        ${ZOEK_BRONNEN.map(b => `<a class="card" style="display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit" href="${esc(b.url(q, f.plaats, f.straal))}" target="_blank" rel="noopener"><i class="ti ${b.icon}" style="font-size:20px;color:var(--accent)"></i><span style="flex:1;min-width:0"><b style="font-weight:600">${esc(b.naam)}</b><span class="s" style="display:block">${esc(b.sub)}</span></span><i class="ti ti-external-link sub"></i></a>`).join("")}
+        ${eigen.map(b => `<a class="card" style="display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit" href="${esc(b.url.includes("{q}") ? b.url.replace("{q}", enc(q)) : b.url)}" target="_blank" rel="noopener"><i class="ti ti-bookmark" style="font-size:20px;color:var(--muted)"></i><span style="flex:1;min-width:0"><b style="font-weight:600">${esc(b.naam)}</b><span class="s" style="display:block">Eigen bron</span></span><i class="ti ti-external-link sub"></i></a>`).join("")}
+      </div>
+      <div style="margin-top:22px;max-width:760px;border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--side)">
+        <div style="font-weight:600;margin-bottom:4px"><i class="ti ti-link-plus"></i> Gevonden? Voeg toe vanaf de link</div>
+        <div class="sub" style="margin-bottom:10px">Plak de link van de vacature. Organisatie en functie vul je zelf in of later in het leesvenster.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">
+          <input class="f" id="aLink" type="url" placeholder="https://…" style="border-color:var(--line);background:var(--pane)">
+          <input class="f" id="aOrg" placeholder="Organisatie" style="border-color:var(--line);background:var(--pane)">
+          <input class="f" id="aFn" placeholder="Functie of stage" style="border-color:var(--line);background:var(--pane)">
+        </div>
+        <div class="inrow" style="margin-top:10px"><span id="aErr" style="color:var(--danger);font-size:12px;flex:1"></span><button class="btn primary sm" id="aAdd"><i class="ti ti-plus"></i>Toevoegen aan Nieuw</button></div>
+      </div>
+    </div>`;
+  const upd = patch => { ui.zoekForm = Object.assign(zoekForm(), patch); saveUi(); renderSearch(); };
+  $("#zSoort").onchange = e => upd({soort:e.target.value});
+  $("#zPlaats").onchange = e => upd({plaats:e.target.value.trim() || "Tilburg"});
+  $("#zStraal").onchange = e => upd({straal:e.target.value});
+  $("#zExtra").onchange = e => upd({extra:e.target.value.trim()});
+  $("#mid").querySelectorAll("[data-r]").forEach(b => b.onclick = () => { const r = new Set(f.richting); r.has(b.dataset.r) ? r.delete(b.dataset.r) : r.add(b.dataset.r); upd({richting:[...r]}); });
+  ["aLink","aOrg","aFn"].forEach(id => $("#"+id).oninput = () => $("#aErr").textContent = "");
+  $("#aAdd").onclick = () => {
+    const link = $("#aLink").value.trim(), org = $("#aOrg").value.trim(), fn = $("#aFn").value.trim();
+    if(!link && !org){ $("#aErr").textContent = "Vul minstens een link of organisatie in."; return; }
+    if(link && !/^https?:\/\//i.test(link)){ $("#aErr").textContent = "De link moet met http:// of https:// beginnen."; return; }
+    if(link && db.items.some(i => i.link === link)){ $("#aErr").textContent = "Deze link staat al in je tracker."; return; }
+    let host = ""; try{ host = new URL(link).hostname.replace(/^www\./,""); }catch(e){}
+    const it = migrate({link, organisatie:org || host, functie:fn, soort:f.soort, status:"nieuw", gelezen:true, bron:"zoeken"});
+    it.historie = [{datum:today(), tekst:"Toegevoegd via Zoeken op het web"}];
+    db.items.push(it); save(); toast("Toegevoegd aan Nieuw");
+    ui.sel = it.id; renderSide(); renderSearch(); renderDetail(); $("#app").classList.add("show-detail");
+    setTimeout(() => { const x = $('#detail [data-k="'+(fn?"locatie":"functie")+'"]'); x && x.focus(); }, 30);
+  };
 }
 
 /* ===== new item ===== */
@@ -603,7 +684,7 @@ function settingsDlg(){
     <div class="dlgb">
       <h3>Reistijd</h3><div class="g2"><label>Max reistijd enkele reis (min)<input class="in" type="number" id="maxR" min="0" step="5" value="${s.maxReistijd}"></label></div>
       <h3>Documentversies</h3><div class="g2"><label>Cv-versies (één per regel)<textarea class="in" id="cvs">${esc(s.cvVersies.join("\n"))}</textarea></label><label>Motivatiebrieven (één per regel)<textarea class="in" id="mots">${esc(s.motivatieVersies.join("\n"))}</textarea></label></div>
-      <h3>Bronnen</h3><div id="bronnen">${bronRows()}</div><button class="btn sm" id="addBron"><i class="ti ti-plus"></i>Bron</button>
+      <h3>Bronnen</h3><p class="sub" style="margin:0 0 8px">Verschijnen ook onder Zoeken op het web. Zet <code>{q}</code> in de URL om de zoekopdracht mee te geven.</p><div id="bronnen">${bronRows()}</div><button class="btn sm" id="addBron"><i class="ti ti-plus"></i>Bron</button>
       <h3>Data</h3><p class="sub" style="margin:0 0 8px">Je data staat alleen in deze browser. Exporteer als back-up of om op een ander apparaat te importeren.</p>
       <div class="inrow" style="flex-wrap:wrap"><button class="btn sm" id="exp"><i class="ti ti-download"></i>Export JSON</button><button class="btn sm" id="imp"><i class="ti ti-upload"></i>Import JSON</button><button class="btn sm" id="csv"><i class="ti ti-table-export"></i>Export CSV</button><button class="btn sm" id="scanFile"><i class="ti ti-file-import"></i>Scanbestand laden</button><button class="btn sm" id="wipe" style="color:var(--danger)"><i class="ti ti-trash"></i>Alles wissen</button></div>
       <h3>Sneltoetsen</h3>${keysHtml()}
@@ -631,16 +712,16 @@ function settingsDlg(){
   });
 }
 function keysHtml(){
-  const K = [[["J","K"],"Volgende / vorige plek"],[["X"],"Selecteren"],[["E"],"Negeren"],[["1","2","3","4","5"],"Interesse, Verstuurd, Gesprek, Aangenomen, Afgewezen"],[["U"],"Markeer als ongelezen"],[["N"],"Nieuwe plek"],[["V"],"Lijst / pijplijn"],[["/"],"Zoeken"],[["Esc"],"Zoeken wissen / terug"],[["?"],"Sneltoetsen"]];
+  const K = [[["J","K"],"Volgende / vorige plek"],[["X"],"Selecteren"],[["E"],"Negeren"],[["1","2","3","4","5"],"Interesse, Verstuurd, Gesprek, Aangenomen, Afgewezen"],[["U"],"Markeer als ongelezen"],[["N"],"Nieuwe plek"],[["V"],"Lijst / pijplijn"],[["Z"],"Zoeken op het web"],[["/"],"Zoeken"],[["Esc"],"Zoeken wissen / terug"],[["?"],"Sneltoetsen"]];
   return `<div class="keys">${K.map(([ks,v])=>`<span>${ks.map(x=>`<kbd>${x}</kbd>`).join(" ")}</span><span>${v}</span>`).join("")}</div>
     <p class="sub" style="margin-top:10px">Zoekfilters: <code>label:afstuderen</code> <code>status:gesprek</code> <code>plaats:breda</code> <code>sector:forensisch</code> <code>deadline:&lt;30d</code> <code>reistijd:&lt;60</code></p>`;
 }
 
 /* ===== events ===== */
-$("#q").oninput = e => { ui.q = e.target.value; $("#qClear").hidden = !ui.q; ui.checked.clear(); renderSide(); ui.view==="board" ? renderBoard() : renderList(); };
+$("#q").oninput = e => { ui.q = e.target.value; $("#qClear").hidden = !ui.q; ui.checked.clear(); if(ui.zoek){ ui.zoek = false; render(); return; } renderSide(); ui.view==="board" ? renderBoard() : renderList(); };
 $("#qClear").onclick = e => { e.preventDefault(); $("#q").value = ""; ui.q = ""; $("#qClear").hidden = true; render(); };
-$("#vList").onclick = () => { ui.view = "list"; saveUi(); render(); };
-$("#vBoard").onclick = () => { ui.view = "board"; saveUi(); render(); };
+$("#vList").onclick = () => { ui.view = "list"; ui.zoek = false; saveUi(); render(); };
+$("#vBoard").onclick = () => { ui.view = "board"; ui.zoek = false; saveUi(); render(); };
 $("#newBtn").onclick = newItem;
 $("#setBtn").onclick = settingsDlg;
 $("#icsBtn").onclick = () => { const ev = events(); ev.length ? (downloadIcs(ev, "stagetracker-herinneringen.ics"), toast(`${ev.length} items – importeer in Google Agenda`)) : toast("Geen deadlines of acties met datum"); };
@@ -655,7 +736,8 @@ document.addEventListener("keydown", e => {
   else if(k === "k" || e.key === "ArrowUp"){ e.preventDefault(); moveSel(-1); }
   else if(k === "/"){ e.preventDefault(); $("#q").focus(); }
   else if(k === "n"){ e.preventDefault(); newItem(); }
-  else if(k === "v"){ ui.view = ui.view === "list" ? "board" : "list"; saveUi(); render(); }
+  else if(k === "v"){ ui.view = ui.view === "list" ? "board" : "list"; ui.zoek = false; saveUi(); render(); }
+  else if(k === "z"){ ui.zoek = true; ui.view = "list"; saveUi(); render(); }
   else if(k === "?"){ openDlg(`<div class="dlgh"><h2>Sneltoetsen</h2><button class="icon-btn" data-close><i class="ti ti-x"></i></button></div><div class="dlgb" style="padding-top:14px">${keysHtml()}</div>`); }
   else if(k === "escape"){ $("#app").classList.remove("show-detail"); }
   else if(!it) return;
