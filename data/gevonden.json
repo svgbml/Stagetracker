@@ -1,5 +1,5 @@
 {
-  "bijgewerkt": "2026-11-14",
+  "bijgewerkt": "2026-11-15",
   "vondsten": [
     {
       "organisatie": "MSD Animal Health",
@@ -48,6 +48,78 @@
       "link": "https://jeroenboschziekenhuis.nl/werken-en-leren-bij-het-jbz/opleidingen-en-stages/op-zoek-naar-een-stage-in-het-jbz/pdf",
       "notities": "Het KCH-lab heeft stageplaatsen voor hbo-studenten; ook een sectie Medische Microbiologie. Geen vacature: stageverzoek mailen naar stage@jbz.nl.",
       "gevondenOp": "2026-11-14"
+    },
+    {
+      "organisatie": "Microvida (ETZ Tilburg)",
+      "functie": "(Senior) Analist Medische Moleculaire Microbiologie",
+      "soort": "Vacature (na afstuderen)",
+      "sector": "Ziekenhuislab",
+      "locatie": "Tilburg (ETZ, Hilvarenbeekseweg)",
+      "reistijd": 20,
+      "deadline": "2026-11-30",
+      "link": "https://laboratorium.nl/vacature/senior-analist-medische-moleculaire-microbiologie-microvida-tilburg/",
+      "notities": "HLO medische microbiologie vereist, ervaring met moleculaire diagnostiek is een pré (geen eis). 32–36 uur, vast contract; geplaatst 13 nov 2026.",
+      "gevondenOp": "2026-11-15"
+    },
+    {
+      "organisatie": "Diakonessenhuis",
+      "functie": "Medisch microbiologisch analist (HLO)",
+      "soort": "Vacature (na afstuderen)",
+      "sector": "Ziekenhuislab",
+      "locatie": "Utrecht",
+      "reistijd": 75,
+      "deadline": "2026-11-22",
+      "link": "https://laboratorium.nl/vacature/medisch-microbiologisch-analist-hlo/",
+      "notities": "Afdeling Medische Microbiologie en Immunologie, 24–36 uur. Afgeronde hbo medische microbiologie vereist, labervaring bij voorkeur; reageren vóór 23 nov.",
+      "gevondenOp": "2026-11-15"
+    },
+    {
+      "organisatie": "Pathan B.V.",
+      "functie": "Histologisch Analist (MLO/HLO)",
+      "soort": "Vacature (na afstuderen)",
+      "sector": "Ziekenhuislab",
+      "locatie": "Rotterdam (Kleiweg)",
+      "reistijd": 75,
+      "deadline": "2026-12-09",
+      "link": "https://laboratorium.nl/vacature/histologisch-analist-mlo-hlo-pathan/",
+      "notities": "Pathologielab, 32–36 uur; ook minder ervaren analisten en kandidaten zonder ziekenhuiservaring welkom. Histopathologie-ervaring is een pré.",
+      "gevondenOp": "2026-11-15"
+    },
+    {
+      "organisatie": "Hubrecht Institute (KNAW)",
+      "functie": "Research Technician Biochemistry",
+      "soort": "Vacature (na afstuderen)",
+      "sector": "Onderzoeksinstituut",
+      "locatie": "Utrecht Science Park",
+      "reistijd": 85,
+      "deadline": "2026-12-24",
+      "link": "https://laboratorium.nl/vacature/research-technician-biochemistry-hlo-msc-and-phd-degrees/",
+      "notities": "Eiwitexpressie/-zuivering en DNA-templatebereiding in het Mattiroli-lab, 38 uur. Open voor HLO; biochemie-ervaring is een sterk pluspunt.",
+      "gevondenOp": "2026-11-15"
+    },
+    {
+      "organisatie": "Erasmus MC – Medische Microbiologie en Infectieziekten",
+      "functie": "Laboratoriumstage diagnostiek of research/afstudeerstage",
+      "soort": "Stage jaar 3",
+      "sector": "Ziekenhuislab",
+      "locatie": "Rotterdam",
+      "reistijd": 75,
+      "deadline": "",
+      "link": "https://www.erasmusmc.nl/nl-nl/onderwijs/opleidingen/microbiologie-laboratoriumstage",
+      "notities": "Voor HLO-studenten richting medische microbiologie; 5–9 maanden, start februari of september. Solliciteren via stage.mmiz@erasmusmc.nl (diagnostiek) of researchstage.mmiz@erasmusmc.nl (research/afstuderen).",
+      "gevondenOp": "2026-11-15"
+    },
+    {
+      "organisatie": "UMC Utrecht – Lab. Translationele Immunologie (diagnostiek)",
+      "functie": "HLO-stage immunologische diagnostiek",
+      "soort": "Stage jaar 3",
+      "sector": "Ziekenhuislab",
+      "locatie": "Utrecht",
+      "reistijd": 85,
+      "deadline": "",
+      "link": "https://www.umcutrecht.nl/nl/stages-divisie-laboratoria-apotheek-en-biomedische-genetica",
+      "notities": "Stages voor HLO-studenten (hemato-oncologie, auto-immuniteit, allergie, transplantatie). Minimaal 3 maanden vóór gewenste start contact opnemen met het secretariaat; geen vacature maar doorlopend aanbod.",
+      "gevondenOp": "2026-11-15"
     }
   ]
 }
